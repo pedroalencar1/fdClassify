@@ -1,0 +1,6 @@
+"0","sum(is.na(data.et$Rn)) == sum(is.na(data.et))
+"
+"1","[1]"
+"1"," TRUE"
+"1","
+"

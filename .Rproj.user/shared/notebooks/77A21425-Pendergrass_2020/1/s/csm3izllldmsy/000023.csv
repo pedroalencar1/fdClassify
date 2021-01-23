@@ -1,0 +1,7 @@
+"0","t.min <- t.min[complete.cases(t.min)]
+"
+"2","Fehler: Must subset columns with a valid subscript vector.
+[34mi[39m Logical subscripts must match the size of the indexed input.
+[31mx[39m Input has size 2 but subscript `i` has size 6940.
+[90mRun `rlang::last_error()` to see where the error occurred.[39m
+"
