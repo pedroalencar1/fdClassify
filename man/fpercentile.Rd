@@ -2,11 +2,16 @@
 \alias{f.percentile}
 \title{Function obtain percentiles}
 \usage{
-f.percentile()
+f.percentile(vector)
 }
 \description{
-*Intern function* to obtain percentiles from absolute (real) data
+*Intern function* to obtain percentiles from absolute data.
 }
+
+\arguments{
+\item{vector}{A vector or dataframe's column or row with numbers.}
+}
+
 \examples{
 f.percentile()
 }
