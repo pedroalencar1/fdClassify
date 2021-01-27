@@ -1,30 +1,6 @@
-# pacman::p_load('ncdf4','ncdf4.helpers','PCICt','ggplot2','tidyr','dplyr','readr'
-#                ,'raster','tibbletime','lubridate','RColorBrewer','stringr','knitr'
-#                ,'tinytex','data.table','runner', 'reshape2', 'tidyquant', 'SPEI'
-#                , 'ts', 'expss', 'ggforce')
-#
-#
-# WD <- "C:/Users/pedro/OneDrive/@DOUTORADO/@@TU-Berlin/@Artigos/CAP 4/R"
-# setwd(WD)
-# de.tha <- read.csv('FLX_DE-Tha_FLUXNET2015_SUBSET_DD_1996-2014_1-4.csv')
-# df <- de.tha
-# swc <- df[,c('TIMESTAMP','SWC_F_MDS_1')]
-# swc$TIMESTAMP <- ymd(swc$TIMESTAMP)
-# swc <- na_if(swc,-9999) #%>% .[complete.cases(.),]
-# colnames(swc) <- c('time', 'swc')
-#
-# #####
-#
-# de_tha.list <- FordLabosier2017(swc)
-# de_tha.swc_series <- de_tha.list[[1]]
-# de_tha.fd_info <- de_tha.list[[2]]
+## function to identify FD based on Ford and Laboiser 2017
 
 FordLabosier2017 <- function(swc){
-
-  # if(!require('lubridate'))install.packages('lubridate')
-  # if(!require('tibbletime'))install.packages('tibbletime')
-  # if(!require('dplyr'))install.packages('dplyr')
-  # if(!require('stats'))install.packages('stats')
 
   #get pentads
   pentad.swc.list <- f.pentad(swc)
@@ -33,7 +9,7 @@ FordLabosier2017 <- function(swc){
 
   # get percentiles
   percentile.swc <- t(apply(pentad.swc,1, f.percentile))
-  ts.percentile.swc <- ts(c(percentile.swc), frequency = 73, start = beg)
+  ts.percentile.swc <- ts(c(percentile.swc), frequency = 73, start =  min(year(series.swc$time)))
 
   #get column of percentiles
   percentile.series <- c(percentile.swc)

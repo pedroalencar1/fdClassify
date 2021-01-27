@@ -1,41 +1,9 @@
-# pacman::p_load('ncdf4','ncdf4.helpers','PCICt','ggplot2','tidyr','dplyr','readr'
-#                ,'raster','tibbletime','lubridate','RColorBrewer','stringr','knitr'
-#                ,'tinytex','data.table','runner', 'reshape2', 'tidyquant', 'SPEI'
-#                , 'ts', 'expss', 'ggforce')
-#
-# #
-# WD <- "C:/Users/pedro/OneDrive/@DOUTORADO/@@TU-Berlin/@Artigos/CAP 4/R"
-# setwd(WD)
-# df <- de.tha
-# data.spei <- df[,c('TIMESTAMP_START','P_F','TA_F')]
-# write.csv(data.spei,'de_tha_spei.csv')
-# data.spei$TIMESTAMP_START <- ymd_hm(data.spei$TIMESTAMP_START)
-# data.spei <- na_if(data.spei,-9999)
-# # sum(is.na(data.spei$u))
-# colnames(data.spei) <- c('time', 'p', 'temp')
-# my_lat <- 50.963611
-#
-# test <- Noguera2020(data.spei,my_lat)
-
-#####
-
-# de_tha.list <- Noguera2020(et0)
-# de_tha.et0_series <- de_tha.list[[1]]
-# de_tha.et0fd_info <- de_tha.list[[2]]
-# nrow(de_tha.et0fd_info)
-
 Noguera2020 <- function(data.spei, my_lat){
-
- # if(!require('lubridate'))install.packages('lubridate')
- # if(!require('tibbletime'))install.packages('tibbletime')
- # if(!require('dplyr'))install.packages('dplyr')
- # if(!require('stats'))install.packages('stats')
-
 
   data.temp <- data.spei[,c(1,3)]
   data.prec <- data.spei[,c(1,2)]
 
-  precipitation <- precipiration_day(data_prec)
+  precipitation <- precipiration_day(data.prec)
   et0 <- hargreaves_day(data.temp, my_lat)
 
   deficit <- data.frame(time = et0$time, deficit = precipitation$p - et0$et)
@@ -53,7 +21,7 @@ Noguera2020 <- function(data.spei, my_lat){
 
   #get accumulated deficit over four weeks
   n = 4 #accumulation time in weeks (defaut = 4)
-  deficit <- runner(deficit_week, f = function(x) sum(x), k = n)
+  deficit <- runner(week.deficit$deficit, f = function(x) sum(x), k = n)
   deficit[1:(n-1)] <- -1e7
 
   deficit_ac_week <- as.data.frame(matrix(deficit, ncol = 19, byrow = F))
@@ -75,6 +43,10 @@ Noguera2020 <- function(data.spei, my_lat){
   # head(prob)
 
   spei <- as.data.frame(qnorm(prob)) #normalization
+
+  beg <- min(year(data.temp[,1])) #year of the series beginning
+  end <- max(year(data.temp[,1]))
+
   date <- data.frame(year = sort(rep(beg:end,48)), month = rep(sort(rep(1:12,4)),19),
                      day = rep(c(1,9,16,22),228))
   date$date <- as.Date(paste(date$year, date$month, date$day, sep='-'))
@@ -142,6 +114,4 @@ Noguera2020 <- function(data.spei, my_lat){
   output <- list('spei_timeseries' = fd.info, 'FD_info' = fd.summary)
 
   return(output)
-
-
 }
