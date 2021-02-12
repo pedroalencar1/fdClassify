@@ -1,6 +1,7 @@
 # Function to clean the ESR data
 Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
 
+
   data_et <- data.frame(time = vtime, et0 = vET0, eta = vETa)
 
   data_et$esr <- data_et$eta/data_et$et0
@@ -46,27 +47,42 @@ Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
     }
     if ( (is.na(series.esr$var[i])) & (is.na(series.esr$var[i-1])) ){
       series.esr$isna[i] <- series.esr$isna[i-1]+1
-      series.esr$isna[i-1] <- series.esr$isna[i]
+      # series.esr$isna[i-1] <- series.esr$isna[i]
     }
   }
+
+  count1 <- nrow(series.esr)
+  while (count1 > 1){
+    if (is.na(series.esr$var[count1])){
+      aux <- series.esr$isna[count1]
+
+      if (aux > 1){
+        for (i in 1:(aux-1)){
+          series.esr$isna[count1-i] <- series.esr$isna[count1]
+        }
+        count1 <- count1 - aux
+      } else{count1 <- count1 - 1}
+    } else {count1 <- count1 - 1}
+  }
+
+
 
   ## 2) implement linear interpolation, considering consecutive pentads with NA
   aux_count <- max(series.esr$isna) #if larger than 1 there are consecutive pentads
   # with NaN
 
-  for (j in 1:aux_count){
-    for (i in 2:(nrow(series.esr)-1)){
-      if (is.na(series.esr$var[i])){
-        # calculates the interpolation increments
-        dif <- (series.esr$var[i+j] - series.esr$var[i-1])/(j+1)
+  for (i in 2:(nrow(series.esr)-1)){
+    if (is.na(series.esr$var[i])){
+      # calculates the interpolation increments
+      aux_na <- series.esr$isna[i]
+      dif <- (series.esr$var[i+aux_na] - series.esr$var[i-1])/(aux_na+1)
+      for (j in 0:(aux_na-1)){
+        series.esr$var[i+j] <- series.esr$var[i-1]+ dif*(j+1)
 
-        for (k in 0:(j-1)){
-          series.esr$var[i+k] <- series.esr$var[i-1]+ dif*(k+1)
-
-        }
       }
     }
   }
+
 
   # get pentads in matrix form
   pentad.esr <- matrix(series.esr$var, nrow = 73, byrow = F)

@@ -1,4 +1,5 @@
 Christian2020 <- function(esr_list){
+
   series.esr <- esr_list[[1]]
   pentad.esr <- esr_list[[2]]
 
@@ -34,7 +35,7 @@ Christian2020 <- function(esr_list){
                             sesr_perc = c(pentad.sesr_percentile),
                             d.sesr_value = c(pentad.delta_sesr_value),
                             d.sesr_perc = c(pentad.delta_sesr_percentile))
-
+  # View(series_sesr)
   #############################################################################
   # 2) apply rules 1 to 3
 
@@ -42,7 +43,6 @@ Christian2020 <- function(esr_list){
   series_sesr$year <- year(series_sesr$time)
   series_sesr$pentad <- rep(1:73,(max(series_sesr$year)-
                                     min(series_sesr$year) + 1))
-
 
   # set two columns of auxiliar indexes
   # aux_delta indicates lines (pentads) that satisfy the variation threshold
@@ -56,10 +56,11 @@ Christian2020 <- function(esr_list){
     }
   }
 
+
   # this gets the duration of the consecutive accumulation of delta_sesr over
   #  periods from 1 to 18 pentads.
-  max_ds <- matrix(data = 0, nrow = nrow(series_sesr), ncol = 18)
-  for (i in 1:18){
+  max_ds <- matrix(data = 0, nrow = nrow(series_sesr), ncol = 30)
+  for (i in 1:30){
     max_ds[,i] <- runner(series_sesr$aux_delta2, k = i, f = max)
   }
 
@@ -70,13 +71,18 @@ Christian2020 <- function(esr_list){
   # This step allows pentads with delta_sesr during FD, but no consecutive occurances
   series_sesr$dur <- 0
   for (i in 2:nrow(series_sesr)){
+    # if (max(max_ds[i,], na.rm = T)==1){
+    # series_sesr$dur[i] <- series_sesr$dur[i-1]+1
+    # } else {
     series_sesr$dur[i] <- (min(which(max_ds[i,] != 1))-1)*(series_sesr$sesr_perc[i] < 20)
+    # }
   }
 
-
+  # View(max_ds)
   # selects only events which attenc the first three rules
   series_sesr_selec <- series_sesr[(!is.na(series_sesr$dur) & series_sesr$dur>5),]
 
+  # View(series_sesr_selec)
   #############################################################################
   # 3) apply rules 1 to 3
 
@@ -116,6 +122,5 @@ Christian2020 <- function(esr_list){
 
   output <- list('SESR_timeseries' = series_sesr_output,
                  'FD_info' = series_sesr_selec)
-
   return(output)
 }
