@@ -40,5 +40,6 @@ get.nc.data <- function(my_lon,my_lat,my_filename,vname){
     # close nc file
     nc_close(ncin)
   }
-  write.table(all_data,paste('data_',vname,'.txt',sep = ''),sep = ';')
+  write.csv(all_data,paste('data_',vname,'.csv',sep = ''),sep = ';')
+  return(all_data)
 }

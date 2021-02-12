@@ -1,4 +1,4 @@
-f.pentad <- function(data.var){
+f.pentad <- function(data.var, na_rm = F){
 
   #define a column of years and reload start and end of series
   data.var$year <- year(data.var[,1])
@@ -16,7 +16,7 @@ f.pentad <- function(data.var){
                                value = year.var[,2]) %>% as_tbl_time(time)
     pentad.var <- collapse_by(year.var, period = '5 days')
     pentad.var <- pentad.var %>% group_by(time) %>%
-      summarise(var = mean(.data[["value"]]))
+      summarise(var = mean(.data[["value"]], na.rm = na_rm))
 
     #in leap years, the last pentad has 6 days
     if (nrow(pentad.var) == 74){
