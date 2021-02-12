@@ -1,14 +1,13 @@
 # Function to clean the ESR data
 Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
 
-
   data_et <- data.frame(time = vtime, et0 = vET0, eta = vETa)
 
   data_et$esr <- data_et$eta/data_et$et0
   data_et$esr[is.infinite(data_et$esr)] <- NA
   data_et$esr[is.nan(data_et$esr)] <- NA
   data_et$esr[(data_et$esr) < 0] <- NA
-  data_et$esr[(data_et$esr) > 1] <- NA ### this is flexible. Christian used 2.
+  data_et$esr[(data_et$esr) > threshold] <- NA ### this is flexible. Christian used 2.
 
   count_NA <- sum(is.na(data_et$esr))
 
