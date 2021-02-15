@@ -44,11 +44,13 @@ FordLabosier2017 <- function(swc){
   for (i in 2:nrow(data.table)){
     data.table$fd[i] <- (data.table$percentile.series[i] <= 20) *
       (data.table$a.min[i] <= -20) *
-      (data.table$percentile.series[i-data.table$p.min[i]] >= 40)
+      (data.table$percentile.series[i-data.table$p.min[i]] >= 40)*
+      (max(data.table$percentile.series[(i+1):(i+4)]) <= 30)
+
   }
 
   data.table$p.min <- data.table$p.min * data.table$fd
-
+  data.table[is.na(data.table)] <- 0 #avoid errors
   #function to get beginning, end and duration of FD
   data.table$event <- 0
   data.table$dur <- 0

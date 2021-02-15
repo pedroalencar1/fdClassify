@@ -19,12 +19,14 @@ Noguera2020 <- function(data.spei, my_lat){
   week.deficit$week.code <- as.Date(week.deficit$week.code)
   week.deficit <- arrange(week.deficit,week.code)
 
+  nyear <- max(year(data.temp[,1])) - min(year(data.temp[,1])) + 1
+
   #get accumulated deficit over four weeks
   n = 4 #accumulation time in weeks (defaut = 4)
   deficit <- runner(week.deficit$deficit, f = function(x) sum(x), k = n)
   deficit[1:(n-1)] <- -1e7
 
-  deficit_ac_week <- as.data.frame(matrix(deficit, ncol = 19, byrow = F))
+  deficit_ac_week <- as.data.frame(matrix(deficit, ncol = nyear, byrow = F))
   # deficit_ac_week <- deficit_ac
 
   deficit_ac_sort_week <-t(apply(deficit_ac_week, 1, sort))
@@ -32,7 +34,7 @@ Noguera2020 <- function(data.spei, my_lat){
   # plot(deficit_ac_sort[10,])
   # deficit_ac_sort_week <- deficit_ac_sort
 
-  parameters <- pwm_3llgt(deficit_ac_sort_week)
+  parameters <- param_loglogist(deficit_ac_sort_week, n_param = 3)
 
   deficit_ac_week[deficit_ac_week == -1e7] <- NA
 

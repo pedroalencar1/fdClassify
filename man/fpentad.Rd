@@ -1,6 +1,6 @@
 \name{f.pentad}
 \alias{f.pentad}
-\title{function to extract data from a pixel in a NC file for an expecific variable}
+\title{function to organize the data into pentads with the average value of the variable}
 \usage{
 f.pentad(data.var)
 }
