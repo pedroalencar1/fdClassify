@@ -14,6 +14,8 @@ Function of classify as FD based on Mo and Lettenmeier, 2016.
 
 \details{
 Preferably use \code{Christian2020_clean_data} to get the input data for this function.
+
+For more information, please refer to \url{https://doi.org/10.1088/1748-9326/ab9faf}
 }
 
 \examples{

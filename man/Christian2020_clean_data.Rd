@@ -9,7 +9,7 @@ Organize and clean data to implement Flash Drought identification via Crhistian 
 }
 
 \arguments{
-\item{vtime}{a vector or dataframe column with time stamps}
+\item{vtime}{a vector or dataframe column with time stamps (\code{date} or \code{POSIX} type)}
 \item{vET0}{a vector or dataframe column with daily potential evapotranspiration (mm. day-1). It can be obtained using the function \code{penman_day}}
 \item{vETa}{a vector or dataframe column with daily actual evapotranspiration (mm. day-1). It can be obtained using the function \code{actual_evap_day}}
 \item{threshold}{a numeric value, equal to or larger than 1. It indicates wich values of ESR above one will be discarded.}

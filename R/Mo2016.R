@@ -6,23 +6,11 @@ Mo2016 <- function(v.time, v.precipitation, v.temperature, v.soil_water,
 
   # allow direct input of actual evapotranspiration data
   if (flux_data){
-    #set auxiliar variables
-    latent_d <- (2500.96 - 2.37*v.temperature)*0.001
-    density_w <- 999.84 - 0.005*v.temperature^2
-    #get actual evapotranspiration
-    v.evap <- 89.4*v.latent_heat*(latent_d*density_w)^-1
+    v.evap <- actual_evap_day(v.time = v.time, v.latent_heat = v.latent_heat,
+                              v.temperature = v.temperature)
     #remove negative values (condensation)
     v.evap[v.evap < 0] <- 0
   } else {v.evap[v.evap < 0] <- 0}
-
-
-  #set auxiliar variables
-  latent_d <- (2500.96 - 2.37*v.temperature)*0.001
-  density_w <- 999.84 - 0.005*v.temperature^2
-  #get actual evapotranspiration
-  v.evap <- 89.4*v.latent_heat*(latent_d*density_w)^-1
-  #remove negative values (condensation)
-  v.evap[v.evap < 0] <- 0
 
   #get dataa into list
   list_classification <- list(precipitation = data.frame(time = v.time,
@@ -194,6 +182,12 @@ Mo2016 <- function(v.time, v.precipitation, v.temperature, v.soil_water,
   # create complete dataframe with climate data, statistics and fd identification
   fd_data_series <- cbind(pentad_series, pentad_series_stat[,2:ncol(pentad_series_stat)]
                           , pentad_df[,c(4,5,6,7)])
+
+  colnames(fd_data_series) <- c('time', 'precipitation', 'temperature', 'soil_water',
+                                'actual_evap', 'prec_anom', 'prec_percentile',
+                                'temp_anom','sw_anom','eta_anom', 'HWFD', 'PDFD',
+                                'joint', 'event_hwfd','event_pdfd', 'event_joint')
+
   #set data into output
   output <- list('data_timeseries' = fd_data_series, 'FD_info' = fd_summary)
 

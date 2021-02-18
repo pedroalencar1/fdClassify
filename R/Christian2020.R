@@ -88,7 +88,7 @@ Christian2020 <- function(esr_list){
 
   n_events <- nrow(series_sesr_selec)
 
-  # set an auxiliar pentad matrix - simple way to avoid errors in FD occuring
+  # set an auxiliar pentad matrix - simple way to avoid errors in FD occurring
   #   in the beginning of years
   pentad.delta_sesr_aux <- rbind(pentad.delta_sesr, pentad.delta_sesr)
   pentad.sesr_percentile <- t(apply(pentad.sesr_value,1, f.percentile))
@@ -119,6 +119,25 @@ Christian2020 <- function(esr_list){
 
   series_sesr_output <- series_sesr[,-c(9,10)]
   series_sesr_output$dur[is.nan(series_sesr_output$dur)] <- NA
+
+  # get series of 20 and 40 percentiles for visualization
+  n_years <- max(year(series.esr$time)) - min(year(series.esr$time)) + 1
+  p20 <- NA
+  for (i in 1:73){
+    p20[i] <- quantile(pentad.delta_sesr[i,], probs = 0.2, na.rm = T)
+  }
+  p20_series <- rep(p20,n_years)
+
+
+  series_sesr_output$p20 <- p20_series
+
+  #id flash droughts in the large df
+  series_sesr_output$is.fd <- 0
+  for (i in 1:nrow(series_sesr_output)){
+    if (is.element(series_sesr_output$time[i], series_sesr_selec$time)){
+      series_sesr_output$is.fd[i] <- 1
+    }
+  }
 
   output <- list('SESR_timeseries' = series_sesr_output,
                  'FD_info' = series_sesr_selec)

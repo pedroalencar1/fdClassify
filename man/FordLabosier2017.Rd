@@ -2,21 +2,26 @@
 \alias{FordLabosier2017}
 \title{Function - Flash Drought classification via Foster and Labosier 2017}
 \usage{
-FordLabosier2017(data)
+FordLabosier2017(vtime, vswc, crit1 = 40, crit2 = 20, crit3 = 30)
 }
 \description{
 Function of classify as FD based on Foster and Labosier2017.
 }
 
 \arguments{
-\item{data}{a dataframe with two columns, time and soil water content (SWC) respectivelly}
+\item{vtime}{a vector or dataframe column with time stamps (\code{date} or \code{POSIX} type)}
+\item{vswc}{a vector or dataframe column with daily soil moisture or soil water content}
+\item{crit}an array with three numeric (non-negative integer) values. The first contains the upper limit for FD identification, the second the lower limit and the third the recuperation threshold after FD initiation.}
 }
 
 \details{
+Please attention to the order of the criteria (\code{crit}).
+
 The output is a list with two data.frames. One with a time-stamped soil water content, percentile and flash drought flagging. The second a summary with each FD event, it's begging, onset and end dates and its duration in pentads.
 
+For more information, please refer to \url{https://doi.org/10.1016/j.agrformet.2017.08.031}
 }
 
 \examples{
-FordLabosier2017(df)
+FordLabosier2017(vtime, vswc, crit1 = 40, crit2 = 20, crit3 = 30)
 }

@@ -1,5 +1,6 @@
-Osman2021 <- function(swc){
+Osman2021 <- function(vtime, vswc, threshold = 20){
 
+  swc <- data.frame(time = vtime, swc = vswc)
   # set data into pentads
   swc_pentad <- f.pentad(swc)
 
@@ -21,14 +22,25 @@ Osman2021 <- function(swc){
 
   colnames(swc_df) <- c('date', 'swc','mvAvg_swc', 'percentile')
 
+  # pentad swc lower than moving average
   swc_df$crit1 <- (swc_df$swc < swc_df$mvAvg_swc)*1
 
+  #acumulate previous value
   swc_df$crit2 <- 0
   for (i in 2:nrow(swc_df)){
     swc_df$crit2[i] <- (swc_df$crit1[i] + swc_df$crit2[i-1])*swc_df$crit1[i]
   }
 
-  swc_df$dur <- (swc_df$crit2 >3)*(swc_df$percentile < 20)*swc_df$crit2
+  #check minimum lenght and SM percentile
+  swc_df$dur <- (swc_df$crit2 >3)*(swc_df$percentile < threshold)*swc_df$crit2
+
+  #get correct duration
+  for (i in 2:nrow(swc_df)){
+    if ((swc_df$dur[i-1] > 0) & (swc_df$percentile[i] < threshold)){
+      swc_df$dur[i] <- swc_df$dur[i-1] +1
+    }
+  }
+
   swc_df$is.fd <- (swc_df$dur > 0)*1
 
   swc_df$event <- 0
@@ -47,17 +59,17 @@ Osman2021 <- function(swc){
 
   # get series of 20 and 40 percentiles for visualization
   n_years <- max(year(swc_pentad[[1]]$time)) - min(year(swc_pentad[[1]]$time)) + 1
-  p20 <- NA
+  p_threshold <- NA
   p40<- NA
   for (i in 1:73){
-    p20[i] <- quantile(swc_pentad[[2]][i,], probs = 0.2, na.rm = T)
+    p_threshold[i] <- quantile(swc_pentad[[2]][i,], probs = threshold/100, na.rm = T)
     p40[i] <- quantile(swc_pentad[[2]][i,], probs = 0.4, na.rm = T)
   }
-  p20_series <- rep(p20,n_years)
+  p_threshold_series <- rep(p_threshold,n_years)
   p40_series <- rep(p40,n_years)
 
   #add p20 and p40 for visualization
-  swc_df$p20 <- p20_series[firstNonNA:length(p20_series)]
+  swc_df$pthreshold <- p_threshold_series[firstNonNA:length(p_threshold_series)]
   swc_df$p40 <- p40_series[firstNonNA:length(p40_series)]
 
   NAs <- data.frame(matrix(NA,ncol = ncol(swc_df), nrow =firstNonNA - 1))

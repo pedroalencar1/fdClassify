@@ -5,7 +5,7 @@
 f.percentile(vector)
 }
 \description{
-*Intern function* to obtain percentiles from absolute data.
+\emph{Intern function} to obtain percentiles from absolute data.
 }
 
 \arguments{

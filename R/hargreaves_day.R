@@ -2,22 +2,9 @@
 
 hargreaves_day <- function(data_temp, my_lat) {
 
-#  if(!require('tibbletime'))install.packages('tibbletime')
-#  if(!require('dplyr'))install.packages('dplyr')
-#  if(!require('stats'))install.packages('stats')
-#  if(!require('lubridate'))install.packages('lubridate')
-
-  #set temperature as tibble ang get min mac and mean temperatures
-  tbl_temperature <- tibble::tibble(time = as.POSIXct(data_temp[,1]),value = data_temp[,2])
-  tbl_temperature[is.na(tbl_temperature)] <- 0
-  tbl_temperature <- as_tbl_time(tbl_temperature, time)
-  temperature <- collapse_by(tbl_temperature, period = 'day')
-  temperature.min <- temperature %>% group_by(time) %>%
-    summarise(min = min(.data[["value"]]))
-  temperature.max <- temperature %>% group_by(time) %>%
-    summarise(max = max(.data[["value"]]))
-  temperature.mean <- temperature %>% group_by(time) %>%
-    summarise(mean = mean(.data[["value"]]))
+  temperature.min <- prepare.nc(data_temp, period = 'day', f = min)
+  temperature.max <- prepare.nc(data_temp, period = 'day', f = max)
+  temperature.mean <- prepare.nc(data_temp, period = 'day', f = mean)
 
   temperature.min <- temperature.min[complete.cases(temperature.min),]
   temperature.max <- temperature.max[complete.cases(temperature.max),]
@@ -48,8 +35,7 @@ hargreaves_day <- function(data_temp, my_lat) {
 
   #compute ET0 as by Hargreaves-Samani
   et0 <- temperature.mean
-  et0$et <- 0.0023*radiation_atmosphere$ra*(temperature.max$max -
-                                              temperature.min$min)*(temperature.mean$mean + 17.8)
+  et0$et <- 0.0023*radiation_atmosphere$ra*(temperature.max$value - temperature.min$value)*(temperature.mean$value + 17.8)
   et0 <- et0[,c(1,3)]
   return(et0)
 }

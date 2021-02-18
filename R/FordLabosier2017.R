@@ -1,6 +1,12 @@
 ## function to identify FD based on Ford and Laboiser 2017
 
-FordLabosier2017 <- function(swc){
+FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
+
+  crit1 = crit[1] #upper limit
+  crit2 = crit[2] #lower limit
+  crit3 = crit[3] # recuperation limit
+
+  swc <- data.frame(time = vtime, swc = vswc)
 
   #get pentads
   pentad.swc.list <- f.pentad(swc)
@@ -42,10 +48,10 @@ FordLabosier2017 <- function(swc){
   #Classification -- branchless style
   data.table$fd <- 0
   for (i in 2:nrow(data.table)){
-    data.table$fd[i] <- (data.table$percentile.series[i] <= 20) *
+    data.table$fd[i] <- (data.table$percentile.series[i] <= crit2) *
       (data.table$a.min[i] <= -20) *
-      (data.table$percentile.series[i-data.table$p.min[i]] >= 40)*
-      (max(data.table$percentile.series[(i+1):(i+4)]) <= 30)
+      (data.table$percentile.series[i-data.table$p.min[i]] >= crit1)*
+      (max(data.table$percentile.series[(i+1):(i+4)]) <= crit3)
 
   }
 
@@ -91,8 +97,22 @@ FordLabosier2017 <- function(swc){
   # get time series of flash drought occurences
   ts.fd <- rbind(matrix(NA,ncol = 1, nrow =firstNonNA - 1), matrix(data.table$fd,ncol = 1))
 
+  # get series of 20 and 40 percentiles for visualization
+  n_years <- max(year(series.swc$time)) - min(year(series.swc$time)) + 1
+  p20 <- NA
+  p40<- NA
+  for (i in 1:73){
+    p20[i] <- quantile(pentad.swc[i,], probs = 0.2, na.rm = T)
+    p40[i] <- quantile(pentad.swc[i,], probs = 0.4, na.rm = T)
+  }
+  p20_series <- rep(p20,n_years)
+  p40_series <- rep(p40,n_years)
+
+  series.swc$p20 <- p20_series
+  series.swc$p40<- p40_series
+
   swc_series <- cbind(series.swc,ts.percentile.swc, ts.fd)
-  colnames(swc_series) <- c('Date','SWC', 'p.SWC', 'is.fd')
+  colnames(swc_series) <- c('Date','SWC','p20','p40', 'p.SWC', 'is.fd')
 
   output <- list('SWC_timeseries' = swc_series, 'FD_info' = fd.summary)
 
