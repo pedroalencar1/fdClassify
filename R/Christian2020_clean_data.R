@@ -1,6 +1,15 @@
 # Function to clean the ESR data
 Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
 
+  #load required packages
+  library('tidyr')
+  library('dplyr')
+  library('readr')
+  library('tibbletime')
+  library('lubridate')
+  library('stringr')
+  library('runner')
+
   aux_year <- lubridate::year
 
   data_et <- data.frame(time = vtime, et0 = vET0, eta = vETa)

@@ -2,6 +2,16 @@
 
 FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
 
+  #load required packages
+  library('tidyr')
+  library('dplyr')
+  library('readr')
+  library('tibbletime')
+  library('lubridate')
+  library('stringr')
+  library('runner')
+
+
   aux_year <- lubridate::year
 
   crit1 = crit[1] #upper limit

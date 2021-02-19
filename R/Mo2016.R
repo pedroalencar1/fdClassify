@@ -4,6 +4,16 @@
 Mo2016 <- function(vtime, vprecipitation, vtemperature, vsoil_water,
                    vlatent_heat = NULL, vevap = NULL, flux_data = T){
 
+  #load required packages
+  library('tidyr')
+  library('dplyr')
+  library('readr')
+  library('tibbletime')
+  library('lubridate')
+  library('stringr')
+  library('runner')
+
+
 
   # allow direct input of actual evapotranspiration data
   if (flux_data){

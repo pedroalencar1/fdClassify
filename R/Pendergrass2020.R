@@ -1,5 +1,14 @@
 Pendergrass2020 <- function(vtime, vet0, limit.up = 5){
 
+  #load required packages
+  library('tidyr')
+  library('dplyr')
+  library('readr')
+  library('tibbletime')
+  library('lubridate')
+  library('stringr')
+  library('runner')
+
 
   et0 <- data.frame(time = vtime, et0 = vet0)
 

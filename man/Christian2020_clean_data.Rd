@@ -23,5 +23,14 @@ This data can be used directly into \code{Christian2020} to identify Flash Drogu
 }
 
 \examples{
-Christian2020_clean_data(vtime, vET0, vETa, threshold = 1)
+ET0 <- penman_day(vtime = de_tha_d$time, vwind = de_tha_d$wind_speed,
+                  vvpd = de_tha_d$vapor_p_def*10, vtemp = de_tha_d$temperature,
+                  vheatflux = (de_tha_d$sensible_heat + de_tha_d$latent_heat))
+
+ETa <- actual_evap_day(vtime = de_tha_d$time, vlatent_heat = de_tha_d$latent_heat,
+                       vtemperature = de_tha_d$temperature)
+
+Christian2020_clean_data(vtime = de_tha_d$time,
+                                         vET0 = ET0$et0, vETa = ETa$eta,
+                                         threshold = 1)
 }

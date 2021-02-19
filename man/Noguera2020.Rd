@@ -23,5 +23,6 @@ The output is a list with two data.frames. One with a time-stamped spei, duratio
 }
 
 \examples{
-Noguera2020()
-}
+fd_noguera <- Noguera2020(vtime = de_tha_h$time,
+                          vprecipitation = de_tha_h$precipitation,
+                          vtemperature = de_tha_h$temperature, my_lat = 50.96)}

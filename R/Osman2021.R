@@ -1,5 +1,15 @@
 Osman2021 <- function(vtime, vswc, threshold = 20){
 
+  #load required packages
+  library('tidyr')
+  library('dplyr')
+  library('readr')
+  library('tibbletime')
+  library('lubridate')
+  library('stringr')
+  library('runner')
+
+
   aux_year <- lubridate::year
 
   swc <- data.frame(time = vtime, swc = vswc)

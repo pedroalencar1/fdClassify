@@ -19,5 +19,7 @@ penman_day(vtime, vwind, vtemp, vvpd, vheatflux, altitude = 0)
 }
 
 \examples{
-penman_day(vtime, vwind, vtemp, vvpd, vheatflux, altitude = 0)
+ET0 <- penman_day(vtime = de_tha_d$time, vwind = de_tha_d$wind_speed,
+                  vvpd = de_tha_d$vapor_p_def*10, vtemp = de_tha_d$temperature,
+                  vheatflux = (de_tha_d$sensible_heat + de_tha_d$latent_heat))
 }

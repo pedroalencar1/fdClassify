@@ -20,5 +20,10 @@ The output is a list with two data.frames. One with a time-stamped ET0, percenti
 }
 
 \examples{
-Pendergrass2020(df)
+ET0 <- penman_day(vtime = de_tha_d$time, vwind = de_tha_d$wind_speed,
+                  vvpd = de_tha_d$vapor_p_def*10, vtemp = de_tha_d$temperature,
+                  vheatflux = (de_tha_d$sensible_heat + de_tha_d$latent_heat))
+
+fd_Pendergrass <- Pendergrass2020(vtime = de_tha_d$time,
+                                  vet0 = ET0$et0, limit.up = 5)
 }

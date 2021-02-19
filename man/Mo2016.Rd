@@ -26,5 +26,7 @@ Note that at least one of \code{v.latent_heat} or \code{v.evap} has to be given 
 }
 
 \examples{
-Pendergrass2020(df)
+fd_Mo <- Mo2016(vtime = de_tha_d$time, vprecipitation = de_tha_d$precipitation,
+                vtemperature = de_tha_d$temperature, vsoil_water = de_tha_d$soil_water,
+                vlatent_heat = de_tha_d$latent_heat)
 }

@@ -1,5 +1,15 @@
 Noguera2020 <- function(vtime, vprecipitation, vtemperature, my_lat, threshold = NA){
 
+
+  #load required packages
+  library('tidyr')
+  library('dplyr')
+  library('readr')
+  library('tibbletime')
+  library('lubridate')
+  library('stringr')
+  library('runner')
+
   #set dataframe
   data.spei <- data.frame(time = vtime, precipitation = vprecipitation,
                           temperature = vtemperature)

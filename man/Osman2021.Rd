@@ -19,5 +19,6 @@ The output is a list with two data.frames. One with a time-stamped soil water co
 }
 
 \examples{
-Osman2021()
+fd_Osman  <- Osman2021(vtime = de_tha_d$time, vswc = de_tha_d$soil_water,
+                       threshold = 20)
 }

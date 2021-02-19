@@ -20,5 +20,6 @@ Attention to the units and the time scale required. Only daily measures are allo
 }
 
 \examples{
-actual_evap_day(v.time, v.latent_heat, v.temperature = 20)
+ETa <- actual_evap_day(vtime = de_tha_d$time, vlatent_heat = de_tha_d$latent_heat,
+                       vtemperature = de_tha_d$temperature)
 }

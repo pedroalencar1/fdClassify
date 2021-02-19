@@ -19,5 +19,14 @@ For more information, please refer to \url{https://doi.org/10.1088/1748-9326/ab9
 }
 
 \examples{
-Christian2020(esr_list)
+ET0 <- penman_day(vtime = de_tha_d$time, vwind = de_tha_d$wind_speed,
+                  vvpd = de_tha_d$vapor_p_def*10, vtemp = de_tha_d$temperature,
+                  vheatflux = (de_tha_d$sensible_heat+de_tha_d$latent_heat))
+
+ETa <- actual_evap_day(vtime = de_tha_d$time, vlatent_heat = de_tha_d$latent_heat,
+                       vtemperature = de_tha_d$temperature)
+
+fd_Christian <- Christian2020_clean_data(vtime = de_tha_d$time,
+                                         vET0 = ET0$et0, vETa = ETa$eta,
+                                         threshold = 1) \%>\% Christian2020()
 }

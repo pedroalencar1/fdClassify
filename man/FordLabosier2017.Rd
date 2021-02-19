@@ -23,5 +23,7 @@ For more information, please refer to \url{https://doi.org/10.1016/j.agrformet.2
 }
 
 \examples{
-FordLabosier2017(vtime, vswc, crit1 = 40, crit2 = 20, crit3 = 30)
+fd_FordLabosier <- FordLabosier2017(vtime = de_tha_d$time,
+                                    vswc = de_tha_d$soil_water,
+                                    crit = c(40,20,30))
 }

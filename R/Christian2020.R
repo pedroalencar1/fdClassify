@@ -1,5 +1,14 @@
 Christian2020 <- function(esr_list){
 
+  #load required packages
+  library('tidyr')
+  library('dplyr')
+  library('readr')
+  library('tibbletime')
+  library('lubridate')
+  library('stringr')
+  library('runner')
+
   aux_year <- lubridate::year
 
 
