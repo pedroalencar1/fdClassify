@@ -1,7 +1,7 @@
 f.week <- function(data.var, na_rm = F, f = mean, kind = 'standard'){
 
   #define a column of years and reload start and end of series
-  data.var$year <- year(data.var[,1])
+  data.var$year <- lubridate::year(data.var[,1])
   beg <- min(data.var$year) #year of the series beginning
   end <- max(data.var$year)
 

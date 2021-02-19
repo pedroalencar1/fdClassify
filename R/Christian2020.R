@@ -1,5 +1,8 @@
 Christian2020 <- function(esr_list){
 
+  aux_year <- lubridate::year
+
+
   series.esr <- esr_list[[1]]
   pentad.esr <- esr_list[[2]]
 
@@ -40,7 +43,7 @@ Christian2020 <- function(esr_list){
   # 2) apply rules 1 to 3
 
   #get years and pentads
-  series_sesr$year <- year(series_sesr$time)
+  series_sesr$year <- aux_year(series_sesr$time)
   series_sesr$pentad <- rep(1:73,(max(series_sesr$year)-
                                     min(series_sesr$year) + 1))
 
@@ -121,7 +124,7 @@ Christian2020 <- function(esr_list){
   series_sesr_output$dur[is.nan(series_sesr_output$dur)] <- NA
 
   # get series of 20 and 40 percentiles for visualization
-  n_years <- max(year(series.esr$time)) - min(year(series.esr$time)) + 1
+  n_years <- max(aux_year(series.esr$time)) - min(aux_year(series.esr$time)) + 1
   p20 <- NA
   for (i in 1:73){
     p20[i] <- quantile(pentad.delta_sesr[i,], probs = 0.2, na.rm = T)

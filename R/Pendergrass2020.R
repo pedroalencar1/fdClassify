@@ -1,4 +1,5 @@
-Pendergrass2020 <- function(vtime, vet0, limit.up = 10){
+Pendergrass2020 <- function(vtime, vet0, limit.up = 5){
+
 
   et0 <- data.frame(time = vtime, et0 = vet0)
 

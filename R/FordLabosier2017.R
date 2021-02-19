@@ -2,6 +2,8 @@
 
 FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
 
+  aux_year <- lubridate::year
+
   crit1 = crit[1] #upper limit
   crit2 = crit[2] #lower limit
   crit3 = crit[3] # recuperation limit
@@ -9,13 +11,14 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
   swc <- data.frame(time = vtime, swc = vswc)
 
   #get pentads
-  pentad.swc.list <- f.pentad(swc)
+  pentad.swc.list <- f.pentad(vtime = swc$time, vvalue = swc$swc,
+                              na_rm = F, f = mean)
   series.swc <- pentad.swc.list$pentad_timestamp
   pentad.swc <- pentad.swc.list$pentad_matrix
 
   # get percentiles
   percentile.swc <- t(apply(pentad.swc,1, f.percentile))
-  ts.percentile.swc <- ts(c(percentile.swc), frequency = 73, start =  min(year(series.swc$time)))
+  ts.percentile.swc <- ts(c(percentile.swc), frequency = 73, start =  min(aux_year(series.swc$time)))
 
   #get column of percentiles
   percentile.series <- c(percentile.swc)
@@ -98,7 +101,7 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
   ts.fd <- rbind(matrix(NA,ncol = 1, nrow =firstNonNA - 1), matrix(data.table$fd,ncol = 1))
 
   # get series of 20 and 40 percentiles for visualization
-  n_years <- max(year(series.swc$time)) - min(year(series.swc$time)) + 1
+  n_years <- max(aux_year(series.swc$time)) - min(aux_year(series.swc$time)) + 1
   p20 <- NA
   p40<- NA
   for (i in 1:73){

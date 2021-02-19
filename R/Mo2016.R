@@ -1,32 +1,34 @@
 
 #function - FD identification based on Mo & Lettenmeier (2015, 2016)
 
-Mo2016 <- function(v.time, v.precipitation, v.temperature, v.soil_water,
-                   v.latent_heat = NULL, v.evap = NULL, flux_data = T){
+Mo2016 <- function(vtime, vprecipitation, vtemperature, vsoil_water,
+                   vlatent_heat = NULL, vevap = NULL, flux_data = T){
+
 
   # allow direct input of actual evapotranspiration data
   if (flux_data){
-    v.evap <- actual_evap_day(v.time = v.time, v.latent_heat = v.latent_heat,
-                              v.temperature = v.temperature)
+    vevap <- actual_evap_day(vtime = vtime, vlatent_heat = vlatent_heat,
+                              vtemperature = vtemperature)
     #remove negative values (condensation)
-    v.evap[v.evap < 0] <- 0
-  } else {v.evap[v.evap < 0] <- 0}
+    vevap[vevap < 0] <- 0
+  } else {vevap[vevap < 0] <- 0}
 
   #get dataa into list
-  list_classification <- list(precipitation = data.frame(time = v.time,
-                                                         value = v.precipitation),
-                              temperature = data.frame(time = v.time,
-                                                       value = v.temperature),
-                              soil_water = data.frame(time = v.time,
-                                                      value = v.soil_water),
-                              actual_evap = data.frame(time = v.time,
-                                                       value = v.evap))
+  list_classification <- list(precipitation = data.frame(time = vtime,
+                                                         value = vprecipitation),
+                              temperature = data.frame(time = vtime,
+                                                       value = vtemperature),
+                              soil_water = data.frame(time = vtime,
+                                                      value = vsoil_water),
+                              actual_evap = data.frame(time = vtime,
+                                                       value = vevap$eta))
 
   #get data from the list into pentads
   list_pentad <- NULL
   var_names <- c('precipitation', 'temperature','soil_water', 'actual_evap')
   for (i in var_names){
-    list_pentad[[i]] <- f.pentad(list_classification[[i]])
+    list_pentad[[i]] <- f.pentad(vtime = list_classification[[i]]$time,
+                                 vvalue = list_classification[[i]]$value)
   }
 
   pentad_series <- cbind(as.data.frame(list_pentad[[var_names[1]]][1]),

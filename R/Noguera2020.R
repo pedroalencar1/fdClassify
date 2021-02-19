@@ -9,7 +9,7 @@ Noguera2020 <- function(vtime, vprecipitation, vtemperature, my_lat, threshold =
 
   #get daily data and deficit
   precipitation <- prepare.nc(data.prec, period = 'day', f = sum)
-  et0 <- hargreaves_day(data.temp, my_lat)
+  et0 <- hargreaves_day(vtime = vtime, vtemperature = vtemperature, my_lat)
   deficit <- data.frame(time = et0$time, deficit = precipitation$value - et0$et)
 
   # cast deficit into weeks and arrange it (weeks according to Noguera)
@@ -59,6 +59,9 @@ Noguera2020 <- function(vtime, vprecipitation, vtemperature, my_lat, threshold =
   for (i in fd.summary$event){
     fd.summary$severity[i] <- sum(fd.info$spei[positions_beg[i]:positions_end[i]])
   }
+
+  output <- list('spei_timeseries' = fd.info,
+                 'FD_info' = fd.summary)
 
   return(output)
 }

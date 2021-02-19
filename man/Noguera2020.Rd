@@ -2,7 +2,7 @@
 \alias{Noguera2020}
 \title{Function - Flash Drought classification via Noguera et al., 2020}
 \usage{
-Noguera2020(data.spei, my_lat)
+Noguera2020(vtime, vprecipitation, vtemperature, my_lat, threshold = NA)
 }
 
 \description{
@@ -10,8 +10,11 @@ Function of classify as FD based on Noguera et al., 2020.
 }
 
 \arguments{
-\item{data.spei}{a dataframe with three columns, time, precipitation and temperature, respectively.}
-\item{my_lat}{pixel or location lontigute and latitude}
+\item{vtime}{a vector or dataframe column with time stamps (\code{date} or \code{POSIX} type)}
+\item{vprecipitation}{a vector or dataframe column with precipiration (mm)}
+\item{vtemperature}{a vector or dataframe column with air temperatures (Celcius)}
+\item{my_lat}{latitude of the studied area}
+\item{threshold}{a negative number, the limit for identification of FD}
 }
 
 \details{

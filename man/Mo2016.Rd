@@ -10,7 +10,7 @@ Function of classify as FD based on Mo and Lettenmeier, 2016.
 }
 
 \arguments{
-\item{v.time}{a vector or dataframe column with time stamps}
+\item{vtime}{a vector or dataframe column with time stamps (\code{date} or \code{POSIX} type)}
 \item{v.precipitation}{a vector or dataframe column with precipiration (mm)}
 \item{v.temperature}{a vector or dataframe column with air temperatures (Celcius)}
 \item{v.soil_water}{a vector or dataframe column with soil moisture or soil water content}

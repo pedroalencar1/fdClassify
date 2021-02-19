@@ -2,7 +2,7 @@
 \alias{f.pentad}
 \title{function to organize the data into pentads with the average value of the variable}
 \usage{
-f.pentad(data.var, na_rm = F, f = mean)
+f.pentad(vtime, vvalue, na_rm = F, f = mean)
 }
 
 \description{

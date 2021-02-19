@@ -3,7 +3,7 @@ f.pentad <- function(vtime, vvalue, na_rm = F, f = mean){
   data.var <- data.frame(time = vtime, var = vvalue)
 
   #define a column of years and reload start and end of series
-  data.var$year <- year(data.var[,1])
+  data.var$year <- lubridate::year(data.var[,1])
   beg <- min(data.var$year) #year of the series beginning
   end <- max(data.var$year)
 

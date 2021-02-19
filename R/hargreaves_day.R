@@ -1,6 +1,8 @@
 ################### BASIC FUNCTIONS ###########################################
 
-hargreaves_day <- function(data_temp, my_lat) {
+hargreaves_day <- function(vtime, vtemperature, my_lat) {
+
+  data_temp <- data.frame(time = vtime, value = vtemperature)
 
   temperature.min <- prepare.nc(data_temp, period = 'day', f = min)
   temperature.max <- prepare.nc(data_temp, period = 'day', f = max)

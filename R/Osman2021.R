@@ -1,8 +1,10 @@
 Osman2021 <- function(vtime, vswc, threshold = 20){
 
+  aux_year <- lubridate::year
+
   swc <- data.frame(time = vtime, swc = vswc)
   # set data into pentads
-  swc_pentad <- f.pentad(swc)
+  swc_pentad <- f.pentad(vtime = swc$time, vvalue = swc$swc)
 
   #calculate pentad percentiles (matrix and array)
   swc_percentile <- t(apply(swc_pentad[[2]],1, f.percentile))
@@ -58,7 +60,7 @@ Osman2021 <- function(vtime, vswc, threshold = 20){
   swc_df <- swc_df[,c(1,9,2,3,4,7)]
 
   # get series of 20 and 40 percentiles for visualization
-  n_years <- max(year(swc_pentad[[1]]$time)) - min(year(swc_pentad[[1]]$time)) + 1
+  n_years <- max(aux_year(swc_pentad[[1]]$time)) - min(aux_year(swc_pentad[[1]]$time)) + 1
   p_threshold <- NA
   p40<- NA
   for (i in 1:73){

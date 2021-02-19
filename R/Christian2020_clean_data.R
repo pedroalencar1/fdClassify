@@ -1,6 +1,8 @@
 # Function to clean the ESR data
 Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
 
+  aux_year <- lubridate::year
+
   data_et <- data.frame(time = vtime, et0 = vET0, eta = vETa)
 
   data_et$esr <- data_et$eta/data_et$et0
@@ -14,8 +16,7 @@ Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
   data_et$issue <- is.na(data_et$esr)*1
   data_et$month <- month(data_et$time)
 
-  esr_pentad <- f.pentad(data.frame(time = data_et$time, esr = data_et$esr)
-                         , na_rm = T)
+  esr_pentad <- f.pentad(vtime = data_et$time, vvalue = data_et$esr, na_rm = T)
 
   #Check data quality for the growing season
   growing_season <- esr_pentad[[2]][19:60,]
@@ -31,7 +32,7 @@ Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
               'pentads have no data and need to be interpolated.'))
 
   series.esr <- esr_pentad[[1]]
-  series.esr$year <- year(series.esr$time)
+  series.esr$year <- aux_year(series.esr$time)
   series.esr$pentad <- rep(1:73,(max(series.esr$year)- min(series.esr$year) + 1))
 
 

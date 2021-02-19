@@ -1,9 +1,11 @@
 f.spei <- function(vtime, vdeficit, n){
 
-  nyear <- max(year(vtime)) - min(year(vtime)) + 1
+  aux_year <- lubridate::year
+
+  nyear <- max(aux_year(vtime)) - min(aux_year(vtime)) + 1
 
   #get accumulated deficit over n periods
-  deficit_acc <- runner(vdeficit, f = function(x) sum(x), k = n)
+  deficit_acc <- runner::runner(vdeficit, f = function(x) sum(x), k = n)
   deficit_acc[1:(n-1)] <- -1e7 #necessary to sort
 
   #get data as matrix with nyear columns.
