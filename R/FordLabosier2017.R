@@ -125,7 +125,7 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
   series.swc$p40<- p40_series
 
   swc_series <- cbind(series.swc,ts.percentile.swc, ts.fd)
-  colnames(swc_series) <- c('Date','SWC','p20','p40', 'p.SWC', 'is.fd')
+  colnames(swc_series) <- c('time','SWC','p20','p40', 'p.SWC', 'is.fd')
 
   output <- list('SWC_timeseries' = swc_series, 'FD_info' = fd.summary)
 

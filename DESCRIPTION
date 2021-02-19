@@ -7,7 +7,11 @@ Maintainer: Pedro Alencar <pedro.alencar@campus.tu-berlin.de>
 Description: This package brings functions to classify FD based on several definitions from the literature:
     - Ford and Labosier (2017)
     - Pendergrass et al. (2020)
+    - Noguera et al. (2020)    
     - Noguera et al. (2020)
+    - Christian et al. (2020)
+    - Osman et al. (2021)
+        * Please refer to the README file for further bibliography of the package
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

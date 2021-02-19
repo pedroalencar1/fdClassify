@@ -40,11 +40,11 @@ Pendergrass2020 <- function(vtime, vet0, limit.up = 5){
                                       data.table$percentile[i-3])) %>%   c(rep(NA,3),.)
 
   #Classification
-  data.table$fd <- 0
+  data.table$is.fd <- 0
   limit.upwards <- limit.up #max recuperation over sustain period
 
   for (i in 4:(nrow(data.table)-3)){
-    data.table$fd[i] <- (data.table$delta[i] <= -50) *
+    data.table$is.fd[i] <- (data.table$delta[i] <= -50) *
       (data.table$percentile[i+1] - data.table$percentile[i] <= limit.upwards) *
       (data.table$percentile[i+2] - data.table$percentile[i] <= limit.upwards) *
       (data.table$percentile[i+3] - data.table$percentile[i] <= limit.upwards)
@@ -52,16 +52,16 @@ Pendergrass2020 <- function(vtime, vet0, limit.up = 5){
 
   #get correct durations
   for (i in 4:(nrow(data.table)-1)){
-    if (data.table$fd[i] ==1){
-      data.table$fd[i-1] = data.table$fd[i-2] <- 1
+    if (data.table$is.fd[i] ==1){
+      data.table$is.fd[i-1] = data.table$is.fd[i-2] <- 1
       if (data.table$dif_perc[i+1] < limit.upwards){
-        data.table$fd[i+1] <- 1
+        data.table$is.fd[i+1] <- 1
       }
     }
   }
 
   #get positon end of dorughts
-  dur_aux1 <- rle(data.table$fd==0)[1]
+  dur_aux1 <- rle(data.table$is.fd==0)[1]
   dur_aux2 <- cumsum(dur_aux1$lengths)
   n <- length(dur_aux2)/2
   durations <- dur_aux1$lengths[c(2*(1:n))]

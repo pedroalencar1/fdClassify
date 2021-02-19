@@ -32,7 +32,7 @@ Osman2021 <- function(vtime, vswc, threshold = 20){
   swc_df <- cbind(swc_pentad[[1]][firstNonNA:nrow(swc_pentad[[1]]),],
                   moving_average_swc, percentile_series)
 
-  colnames(swc_df) <- c('date', 'swc','mvAvg_swc', 'percentile')
+  colnames(swc_df) <- c('time', 'swc','mvAvg_swc', 'percentile')
 
   # pentad swc lower than moving average
   swc_df$crit1 <- (swc_df$swc < swc_df$mvAvg_swc)*1
@@ -87,8 +87,24 @@ Osman2021 <- function(vtime, vswc, threshold = 20){
   NAs <- data.frame(matrix(NA,ncol = ncol(swc_df), nrow =firstNonNA - 1))
   colnames(NAs) <- colnames(swc_df)
   if(firstNonNA>1){
-    NAs$date <- swc_pentad[[1]]$time[1:(firstNonNA - 1)]
+    NAs$time <- swc_pentad[[1]]$time[1:(firstNonNA - 1)]
     swc_df <- rbind(NAs, swc_df)
+  }
+
+
+  #set is.fd column
+  swc_df$dur <- NULL
+  fd_sum_aux <- fd_summary[,c(2,6)]
+
+  swc_df <- left_join(swc_df,fd_sum_aux, by = 'event')
+  swc_df$dur[is.na(swc_df$dur)] <- 0
+  swc_df$is.fd <- 0
+
+  for (i in (1:nrow(swc_df))){
+    if (swc_df$dur[i] > 0) {
+      aux = swc_df$dur[i]-1
+      swc_df$is.fd[(i-aux):i] <- 1
+    }
   }
 
 

@@ -198,7 +198,7 @@ Mo2016 <- function(vtime, vprecipitation, vtemperature, vsoil_water,
   colnames(fd_data_series) <- c('time', 'precipitation', 'temperature', 'soil_water',
                                 'actual_evap', 'prec_anom', 'prec_percentile',
                                 'temp_anom','sw_anom','eta_anom', 'HWFD', 'PDFD',
-                                'joint', 'event_hwfd','event_pdfd', 'event_joint')
+                                'is.fd', 'event_hwfd','event_pdfd', 'event_joint')
 
   #set data into output
   output <- list('data_timeseries' = fd_data_series, 'FD_info' = fd_summary)
