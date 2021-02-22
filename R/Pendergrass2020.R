@@ -1,4 +1,4 @@
-Pendergrass2020 <- function(vtime, vet0, limit.up = 5){
+Pendergrass2020 <- function(vtime, vet0, limit.down = 10){
 
   #load required packages
   library('tidyr')
@@ -20,42 +20,41 @@ Pendergrass2020 <- function(vtime, vet0, limit.up = 5){
   week.et0 <- week.et0.list$week_matrix
 
   # get percentiles
-  percentile.et0 <- t(apply(week.et0,1, f.percentile))
+  # we used the here the percentiles of EDDI as described in Hoggins 2016.
+  # Pendergrass is not quite clear on how to calculate the EDDI. What does a
+  # 50% drop means? a drop in percentile or in absolute eddi?
+  percentile.eddi <- t(apply(week.et0,1, eddi_percentile))
 
   data.table <- data.frame(time = as.Date(series.et0$time),
-                           percentile = c(percentile.et0),
+                           percentile = c(percentile.eddi),
                            et0 = c(week.et0))
 
-  data.table$dif_perc <- append(NA,as.vector(diff(data.table$percentile,
-                                                  lag = 1)))
+  data.table$dif_perc <- append(c(NA,NA),as.vector(diff(data.table$percentile,
+                                                        lag = 2)))
 
   #Remove eventual NA in the beginning of the series
   firstNonNA <- min(which(!is.na(data.table$percentile)))
   data.table <- data.table[firstNonNA:nrow(data.table),]
 
-  # data.table$delta <- NA
-
-  data.table$delta <- unlist(lapply(4:nrow(data.table),
-                                    function(i) data.table$percentile[i] -
-                                      data.table$percentile[i-3])) %>%   c(rep(NA,3),.)
 
   #Classification
   data.table$is.fd <- 0
-  limit.upwards <- limit.up #max recuperation over sustain period
 
-  for (i in 4:(nrow(data.table)-3)){
-    data.table$is.fd[i] <- (data.table$delta[i] <= -50) *
-      (data.table$percentile[i+1] - data.table$percentile[i] <= limit.upwards) *
-      (data.table$percentile[i+2] - data.table$percentile[i] <= limit.upwards) *
-      (data.table$percentile[i+3] - data.table$percentile[i] <= limit.upwards)
+  for (i in 3:(nrow(data.table)-2)){
+    data.table$is.fd[i] <- (data.table$dif_perc[i] >= 50) *
+      (data.table$percentile[i+1] - data.table$percentile[i] > -limit.down) *
+      (data.table$percentile[i+2] - data.table$percentile[i] > -limit.down)
   }
 
   #get correct durations
-  for (i in 4:(nrow(data.table)-1)){
-    if (data.table$is.fd[i] ==1){
-      data.table$is.fd[i-1] = data.table$is.fd[i-2] <- 1
-      if (data.table$dif_perc[i+1] < limit.upwards){
+  for (i in 3:(nrow(data.table)-1)){
+    if (data.table$is.fd[i] ==1 & data.table$is.fd[i-1] ==0){
+      data.table$is.fd[i-1] = 1
+      data.table$is.fd[i-2] = 1
+      limit <- data.table$percentile[i] - limit.downwards
+      while (data.table$percentile[i+1] >= limit){
         data.table$is.fd[i+1] <- 1
+        i = i+1
       }
     }
   }
