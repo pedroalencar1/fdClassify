@@ -1,7 +1,7 @@
 Package: fdClassify
 Type: Package
 Title: Library of Flash Drought classificaition methods
-Version: 0.4.0
+Version: 0.4.1
 Author: Pedro Alencar
 Maintainer: Pedro Alencar <pedro.alencar@campus.tu-berlin.de>
 Description: This package brings functions to classify FD based on several definitions from the literature:
