@@ -9,7 +9,7 @@ eddi_percentile <- function(vet0){
   n <- length(vet0)
   empiric_p <- (1:n -0.33)/(n+0.33) #empiric probabilities (Tukey plotting)
 
-  veddi <- round(empiric_p[order(vet0)]*100)
+  veddi <- round(empiric_p[rank(vet0)]*100)
 
   return(veddi)
 }

@@ -23,7 +23,7 @@ eddi <- function(vet0){
   eddi <- (W - (param$c0 + param$c1*W + param$c2*W^2)*
     (1 + param$d1*W  + param$d2*W^2 + param$d3*W^3)^-1)*(2*(empiric_p >0.5) - 1)
 
-  veddi <- eddi[order(vet0)] # reorder to match input data
+  veddi <- eddi[rank(vet0)] # reorder to match input data
 
   return(veddi)
 }

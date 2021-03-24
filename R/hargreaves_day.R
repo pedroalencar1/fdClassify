@@ -13,10 +13,10 @@ hargreaves_day <- function(vtime, vtemperature, my_lat) {
   temperature.mean <- temperature.mean[complete.cases(temperature.mean),]
 
   #set basic variables
-  beg <- year(temperature.min$time[1])
-  end <- year(tail(temperature.min$time,1))
+  beg <- lubridate::year(temperature.min$time[1])
+  end <- lubridate::year(tail(temperature.min$time,1))
   year_series <- beg:end
-  leap.year_series <- leap_year(year_series)
+  leap.year_series <- lubridate::leap_year(year_series)
   J.series <- NULL
   for (i in 1:length(year_series)){
     if (leap.year_series[i] == TRUE){

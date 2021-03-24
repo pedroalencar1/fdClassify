@@ -6,7 +6,7 @@ penman_day <- function(vtime, vwind, vtemp, vvpd, vheatflux, altitude = 0) {
   Patm <- 101.3*(1 - 2.22*altitude/100000)^5.26
   psychometric_c <- 0.000665*Patm
 
-  vtime <- ymd(vtime)
+  vtime <- lubridate::ymd(vtime)
   vapor_p_sat <- 0.661*exp(17.27*vtemp / (237.3 + vtemp))
   slope_vapor_p <- 4098*vapor_p_sat/(237.3 + vtemp)^2
   #from W m-2 to M m-2 day-2

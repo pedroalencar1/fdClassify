@@ -25,20 +25,14 @@ Noguera2020 <- function(vtime, vprecipitation, vet0, threshold = NA){
   # neg.spei <- spei$spei[spei$spei<0] %>% .[complete.cases(.)] %>% sort(decreasing = T)
   # threshold <- quantile(neg.spei$spei,0.1, na.rm = T)
 
-  #get onset
   spei$is.fd <- (spei$dif <= -2)*(spei$spei <= threshold)
 
   fd.info <- spei[complete.cases(spei),]
 
   # get complete event
   for (i in 2:nrow(fd.info)){
-    # get duration after the onset
     if ((fd.info$is.fd[i-1] == 1) & (fd.info$spei[i] <= threshold)){
       fd.info$is.fd[i] = 1
-    }
-    # get duration before onset (intensification)
-    if ((fd.info$is.fd[i-1] == 0) & (fd.info$is.fd[i] == 1)){
-      fd.info$is.fd[(i-3):(i-1)] <- 1
     }
   }
 

@@ -1,14 +1,14 @@
 # Function to clean the ESR data
 Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
 
-  #load required packages
-  library('tidyr')
-  library('dplyr')
-  library('readr')
-  library('tibbletime')
-  library('lubridate')
-  library('stringr')
-  library('runner')
+  # #load required packages
+  # library('tidyr')
+  # library('dplyr')
+  # library('readr')
+  # library('tibbletime')
+  # library('lubridate')
+  # library('stringr')
+  # library('runner')
 
   aux_year <- lubridate::year
 
@@ -23,13 +23,13 @@ Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
   count_NA <- sum(is.na(data_et$esr))
 
   data_et$issue <- is.na(data_et$esr)*1
-  data_et$month <- month(data_et$time)
+  data_et$month <- lubridate::month(data_et$time)
 
   esr_pentad <- f.pentad(vtime = data_et$time, vvalue = data_et$esr, na_rm = T)
 
   #Check data quality for the growing season
   growing_season <- esr_pentad[[2]][19:60,]
-  pentad_above_1 <- sum(growing_season > 1, na.rm = T) #ESR > 1 -> 0, since we set the threshold to 1.
+  pentad_above_1 <- sum(growing_season > 1, na.rm = T) # if default it is 0.
   pentad_na <- sum(is.nan(growing_season)) # ESR = NaN
   max_esr <- max(growing_season, na.rm = T)
 

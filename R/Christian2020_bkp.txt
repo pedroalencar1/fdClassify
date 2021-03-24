@@ -46,35 +46,47 @@ Christian2020 <- function(esr_list){
   series_sesr <- series_sesr[firstNonNA:nrow(series_sesr),]
   ######
 
-  # criterion 3 -> delta.SESR below 40 allowing 1 pentad recuperation
-  aux_delta <- (series_sesr$d.sesr_perc <= 40)*1
-  aux_delta[is.na(aux_delta)] <- 0
-
-  #get positions where criterion 3 is true
-  df_id <- data.frame(id_abs = rle(aux_delta)[[1]],
-                      class = rle(aux_delta)[[2]])
-
-  # remove contiguous events and update indexes
-  df_id$id_acc <- runner::runner(df_id$id_abs, sum)
-  df_id$id_new <- df_id$id_abs
-  for (i in seq(4,nrow(df_id),2)){
-    if(df_id$id_abs[i-1] == 1){
-      df_id$id_new[i] <- df_id$id_abs[i] + df_id$id_new[i-2] + 1
-      df_id$id_new[i-2] <- 0
-      df_id$id_new[i-1] <- 0
+  # set two columns of auxiliar indexes
+  # aux_delta indicates lines (pentads) that satisfy the variation threshold
+  # aux_delta2 accumulates over the time series and allow us to assess if an
+  #    event attends the minimum duration
+  series_sesr$aux_delta <- (series_sesr$d.sesr_perc <= 40)*1
+  series_sesr$aux_delta2 <- series_sesr$aux_delta
+  for (i in 3:nrow(series_sesr)){
+    if(series_sesr$aux_delta[i] == 1 & series_sesr$aux_delta[i-1] == 1){
+      series_sesr$aux_delta2[i] <- series_sesr$aux_delta2[i-1] + 1
     }
   }
-  df_id$id_acc2 <- runner::runner(df_id$id_new, sum)
+  # this gets the duration of the consecutive accumulation of delta_sesr over
+  #  periods from 1 to 30 pentads (5 months).
+  max_ds <- matrix(data = 0, nrow = nrow(series_sesr), ncol = 30)
+  for (i in 1:30){
+    max_ds[,i] <- runner::runner(series_sesr$aux_delta2, k = i, f = max)
+  }
 
-  # criterion 1 -> at least six pentads duration
-  df_id_fd <- df_id[(df_id$id_new >= 6 & df_id$class == 1),]
-  fd_events <- series_sesr[df_id_fd$id_acc2,]
-  fd_events$dur <- df_id_fd$id_new
+  # set zero values to one, avoid computation errors and does not change the output
+  #  since only values above 6 are considered
+  # max_ds[max_ds==0] <-1
 
-  # criterion 2 -> final SESR percentile lower than 20th.
-  series_sesr_selec <- fd_events[fd_events$sesr_perc <= 20,]
+  # This step allows pentads with delta_sesr during FD, but no consecutive occurances
+  series_sesr$dur <- 0
+  for (i in 2:nrow(series_sesr)){
+    # i = 2
+    # if (max(max_ds[i,], na.rm = T)==1){
+    # series_sesr$dur[i] <- series_sesr$dur[i-1]+1
+    # } else {
+    duration <- (min(which(max_ds[i,] >1))-1)*(series_sesr$sesr_perc[i] < 20)
+    if (is.infinite(duration) | is.nan(duration)){
+      series_sesr$dur[i] <- NA
+    } else {series_sesr$dur[i] <- duration}
 
+  }
 
+  # View(series_sesr)
+  # selects only events which attenc the first three rules
+  series_sesr_selec <- series_sesr[(!is.na(series_sesr$dur) & series_sesr$dur>5),]
+
+  # View(series_sesr_selec)
   #############################################################################
   # 3) apply rule 4
 
@@ -102,7 +114,15 @@ Christian2020 <- function(esr_list){
 
   series_sesr_selec <- series_sesr_selec[series_sesr_selec$av_change_perc <= 30,]
 
-  # Remove redundant events (if any)
+  # # Remove redundant events
+  # for (i in 2:nrow(series_sesr_selec)){
+  #   if (series_sesr_selec$time[i] - series_sesr_selec$time[i-1] == 5){
+  #     series_sesr_selec[i-1,] <- NA
+  #   }
+  # }
+
+
+  # Remove redundant events
   for (i in 2:nrow(series_sesr_selec)){
     if (series_sesr_selec$time[i-1] >= series_sesr_selec$time[i] - 86400*5*series_sesr_selec$dur[i]){
       series_sesr_selec[i-1,] <- NA
@@ -111,11 +131,8 @@ Christian2020 <- function(esr_list){
 
 
   series_sesr_selec <- series_sesr_selec[complete.cases(series_sesr_selec),]
-  series_sesr_selec_duration <- series_sesr_selec[,c(1,9)]
 
   series_sesr_output <- series_sesr[,-c(9,10)]
-  series_sesr_output <- dplyr::left_join(series_sesr_output,series_sesr_selec_duration, by = 'time')
-
   series_sesr_output$dur[is.nan(series_sesr_output$dur)] <- NA
 
   #recompose the time series with NA

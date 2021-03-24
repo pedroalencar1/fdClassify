@@ -4,16 +4,6 @@
 Mo2016 <- function(vtime, vprecipitation, vtemperature, vsoil_water,
                    vlatent_heat = NULL, vevap = NULL, flux_data = T){
 
-  #load required packages
-  library('tidyr')
-  library('dplyr')
-  library('readr')
-  library('tibbletime')
-  library('lubridate')
-  library('stringr')
-  library('runner')
-
-
 
   # allow direct input of actual evapotranspiration data
   if (flux_data){
@@ -160,32 +150,32 @@ Mo2016 <- function(vtime, vprecipitation, vtemperature, vsoil_water,
   ## summary HWFD
   fd_summary_hwfd <- data.frame(event = unique(pentad_df$event_hwfd)[c(-1)])
 
-  fd_summary_hwfd$start <- pentad_df  %>% group_by(event_hwfd) %>%
-    summarise(x = min(.data[["time"]])) %>% .[,2] %>% unlist() %>%
+  fd_summary_hwfd$start <- pentad_df  %>% dplyr::group_by(event_hwfd) %>%
+    dplyr::summarise(x = min(.data[["time"]])) %>% .[,2] %>% unlist() %>%
     as.POSIXct(origin = "1970-01-01") %>% .[c(-1)]
 
-  fd_summary_hwfd$duration <- pentad_df %>% group_by(event_hwfd) %>%
-    summarise(x = max(.data[["dur_hwfd"]])) %>% .[,2] %>% unlist() %>% .[c(-1)]
+  fd_summary_hwfd$duration <- pentad_df %>% dplyr::group_by(event_hwfd) %>%
+    dplyr::summarise(x = max(.data[["dur_hwfd"]])) %>% .[,2] %>% unlist() %>% .[c(-1)]
 
   ## summary PDFD
   fd_summary_pdfd <- data.frame(event = unique(pentad_df$event_pdfd)[c(-1)])
 
-  fd_summary_pdfd$start <- pentad_df  %>% group_by(event_pdfd) %>%
-    summarise(x = min(.data[["time"]])) %>% .[,2] %>% unlist() %>%
+  fd_summary_pdfd$start <- pentad_df  %>% dplyr::group_by(event_pdfd) %>%
+    dplyr::summarise(x = min(.data[["time"]])) %>% .[,2] %>% unlist() %>%
     as.POSIXct(origin = "1970-01-01") %>% .[c(-1)]
 
-  fd_summary_pdfd$duration <- pentad_df %>% group_by(event_pdfd) %>%
-    summarise(x = max(.data[["dur_pdfd"]])) %>% .[,2] %>% unlist() %>% .[c(-1)]
+  fd_summary_pdfd$duration <- pentad_df %>% dplyr::group_by(event_pdfd) %>%
+    dplyr::summarise(x = max(.data[["dur_pdfd"]])) %>% .[,2] %>% unlist() %>% .[c(-1)]
 
   ## summary joint
   fd_summary_joint <- data.frame(event = unique(pentad_df$event_joint)[c(-1)])
 
-  fd_summary_joint$start <- pentad_df  %>% group_by(event_joint) %>%
-    summarise(x = min(.data[["time"]])) %>% .[,2] %>% unlist() %>%
+  fd_summary_joint$start <- pentad_df  %>% dplyr::group_by(event_joint) %>%
+    dplyr::summarise(x = min(.data[["time"]])) %>% .[,2] %>% unlist() %>%
     as.POSIXct(origin = "1970-01-01") %>% .[c(-1)]
 
-  fd_summary_joint$duration <- pentad_df %>% group_by(event_joint) %>%
-    summarise(x = max(.data[["dur_joint"]])) %>% .[,2] %>% unlist() %>% .[c(-1)]
+  fd_summary_joint$duration <- pentad_df %>% dplyr::group_by(event_joint) %>%
+    dplyr::summarise(x = max(.data[["dur_joint"]])) %>% .[,2] %>% unlist() %>% .[c(-1)]
 
   # create a master summary with all events
   fd_summary <- list(hwfd = fd_summary_hwfd, pdfd = fd_summary_pdfd,
