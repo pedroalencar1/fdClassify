@@ -15,14 +15,15 @@ f.pentad <- function(vtime, vvalue, na_rm = F, f = mean){
   for (i in 1:n.years){
     year.var <- year.var.list[[i]][1:2]
     year.var <- tibble::tibble(time = as.POSIXct(year.var[,1]),
-                               value = year.var[,2]) %>% as_tbl_time(time)
-    pentad.var <- collapse_by(year.var, period = '5 days')
-    pentad.var <- pentad.var %>% group_by(time) %>%
-      summarise(var = f(.data[["value"]], na.rm = na_rm))
+                               value = year.var[,2]) %>% tibbletime::as_tbl_time(time)
+    pentad.var <- tibbletime::collapse_by(year.var, period = '5 days')
+    pentad.var <- pentad.var %>% dplyr::group_by(time) %>%
+      dplyr::summarise(var = f(.data[["value"]], na.rm = na_rm))
 
     #in leap years, the last pentad has 6 days
     if (nrow(pentad.var) == 74){
       pentad.var$var[73] <- (pentad.var$var[73]*5 + pentad.var$var[74])/6
+      pentad.var <- pentad.var[1:73,]
     }
     pentad.matrix <- cbind(pentad.matrix,pentad.var$var)
     #set dataframe with all years removing undesireble 74th pentad

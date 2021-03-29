@@ -1,8 +1,6 @@
 f.spei <- function(vtime, vdeficit, n){
 
-  aux_year <- lubridate::year
-
-  nyear <- max(aux_year(vtime)) - min(aux_year(vtime)) + 1
+  nyear <- max(lubridate::year(vtime)) - min(lubridate::year(vtime)) + 1
 
   #get accumulated deficit over n periods
   deficit_acc <- runner::runner(vdeficit, f = function(x) sum(x), k = n)

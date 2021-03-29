@@ -2,18 +2,6 @@
 
 FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
 
-  #load required packages
-  library('tidyr')
-  library('dplyr')
-  library('readr')
-  library('tibbletime')
-  library('lubridate')
-  library('stringr')
-  library('runner')
-
-
-  aux_year <- lubridate::year
-
   crit1 = crit[1] #upper limit
   crit2 = crit[2] #lower limit
   crit3 = crit[3] # recuperation limit
@@ -28,7 +16,6 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
 
   # get percentiles
   percentile.swc <- t(apply(pentad.swc,1, f.percentile))
-  ts.percentile.swc <- ts(c(percentile.swc), frequency = 73, start =  min(aux_year(series.swc$time)))
 
   #get column of percentiles
   percentile.series <- c(percentile.swc)
@@ -38,80 +25,74 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
   percentile.series <- percentile.series[firstNonNA:length(percentile.series)]
 
   #get accumulated difference from 1 to 4 pentads.
-  a1 <- unlist(lapply(1:length(percentile.series),
-                      function(i) percentile.series[i] - percentile.series[i-1])) %>%
-    c(rep(NA,1),.)
-  a2 <- unlist(lapply(2:length(percentile.series),
-                      function(i) percentile.series[i] - percentile.series[i-2])) %>%
-    c(rep(NA,2),.)
-  a3 <- unlist(lapply(3:length(percentile.series),
-                      function(i) percentile.series[i] - percentile.series[i-3])) %>%
-    c(rep(NA,3),.)
-  a4 <- unlist(lapply(4:length(percentile.series),
-                      function(i) percentile.series[i] - percentile.series[i-4])) %>%
-    c(rep(NA,4),.)
+  a1 <- diff(percentile.series, lag = 1)  %>%  c(rep(100,1),.)
+  a2 <- diff(percentile.series, lag = 2)  %>%  c(rep(100,2),.)
+  a3 <- diff(percentile.series, lag = 3)  %>%  c(rep(100,3),.)
+  a4 <- diff(percentile.series, lag = 4)  %>%  c(rep(100,4),.)
+
   # combine data and get the most negative reduction of soil moisture over the previous 4 pentads
   data.table <- as.data.frame(cbind(percentile.series,a1,a2,a3,a4))
   data.table$a.min <- sapply(1:nrow(data.table), function(i) min(data.table[i,2:5],na.rm = T))
-  data.table$p.min <- rbind(NA,as.data.frame(unlist(sapply(1:nrow(data.table),
+  data.table$p.min <- rbind(NA,as.data.frame(unlist(sapply(2:nrow(data.table),
                                                            function(i) which.max(data.table$a.min[i] - data.table[i,2:5])))))
 
   colnames(data.table[,7]) <- 'p.min'
 
   #Classification -- branchless style
   data.table$fd <- 0
-  for (i in 2:nrow(data.table)){
+  for (i in 2:(nrow(data.table)-4)){
+    # i = 1021
+
     data.table$fd[i] <- (data.table$percentile.series[i] <= crit2) *
-      (data.table$a.min[i] <= -20) *
+      # (data.table$a.min[i] <= crit2 - crit1) *
       (data.table$percentile.series[i-data.table$p.min[i]] >= crit1)*
       (max(data.table$percentile.series[(i+1):(i+4)]) <= crit3)
+
+    if ((data.table$fd[i-1] == 1) & (data.table$fd[i] == 1)){
+      data.table$fd[i-1] <- 0
+    }
 
   }
 
   data.table$p.min <- data.table$p.min * data.table$fd
   data.table[is.na(data.table)] <- 0 #avoid errors
+
   #function to get beginning, end and duration of FD
   data.table$event <- 0
   data.table$dur <- 0
   count <- 0
   for (i in 2:nrow(data.table)){
-    if (data.table$fd[i-1] == 0 & data.table$fd[i] == 1){
+    if (data.table$fd[i] == 1){
       count <- count + 1
       data.table$event[i] <- count
-      data.table$dur[i] <- 1
+      data.table$dur[i] <- data.table$p.min[i] + 4
     }
-    if (data.table$fd[i-1] == 1 & data.table$fd[i] == 1){
-      data.table$event[i] <- count
-      data.table$dur[i] <- data.table$dur[i-1] + 1
-    }
+
   }
   #get dates from SWC series
   data.table$date <- series.swc$time[firstNonNA:nrow(series.swc)]
 
-  #set output data: beg, onset, end, duration
-  fd.summary <- data.frame(event = unique(data.table$event)[c(-1)])
+  fd.summary <- data.table[data.table$fd == 1,] %>%
+    dplyr::select(date,event,dur, percentile.series,a.min)
 
-  fd.summary$onset <- data.table  %>% group_by(event) %>%
-    summarise(x = min(.data[["date"]])) %>% .[,2] %>% unlist() %>%
-    as.POSIXct(origin = "1970-01-01") %>% .[c(-1)]
-
-  fd.summary$end <- data.table  %>% group_by(event) %>%
-    summarise(x = max(.data[["date"]])) %>% .[,2] %>% unlist() %>%
-    as.POSIXct(origin = "1970-01-01") %>% .[c(-1)]
-
-  fd.summary$dur <- data.table  %>% group_by(event) %>%
-    summarise(x = max(.data[["dur"]]) + min(max(.data[["p.min"]]))) %>% .[,2] %>%
-    unlist() %>% .[c(-1)]
-
-  fd.summary$beg <- fd.summary$end - fd.summary$dur*5*86400
-
-  fd.summary <- fd.summary[,c(1,5,2,3,4)]
 
   # get time series of flash drought occurences
-  ts.fd <- rbind(matrix(NA,ncol = 1, nrow =firstNonNA - 1), matrix(data.table$fd,ncol = 1))
+  #get correct duration
+  data.table$is.fd <- 0
+  i = 1
+  while(i < nrow(data.table)){
+    if (data.table$fd[i] == 1){
+      back <- data.table$p.min[i] - 1
+      data.table$is.fd[(i - back):(i+4)] <- 1
+      i <- i+4
+    }
+    i <- i + 1
+  }
 
+  ts.fd <- rbind(matrix(NA,ncol = 1, nrow =firstNonNA - 1), matrix(data.table$is.fd,ncol = 1))
+  nrow(ts.fd)
   # get series of 20 and 40 percentiles for visualization
-  n_years <- max(aux_year(series.swc$time)) - min(aux_year(series.swc$time)) + 1
+  n_years <- max(lubridate::year(series.swc$time)) - min(lubridate::year(series.swc$time)) + 1
   p20 <- NA
   p40<- NA
   for (i in 1:73){
@@ -124,10 +105,17 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
   series.swc$p20 <- p20_series
   series.swc$p40<- p40_series
 
-  swc_series <- cbind(series.swc,ts.percentile.swc, ts.fd)
+  percentile.series <- c(rep(NA,firstNonNA-1),percentile.series) #recompose length percentile series
+
+  swc_series <- cbind(series.swc,percentile.series, ts.fd)
+
   colnames(swc_series) <- c('time','SWC','p20','p40', 'p.SWC', 'is.fd')
+
 
   output <- list('SWC_timeseries' = swc_series, 'FD_info' = fd.summary)
 
   return(output)
+
+
+
 }
