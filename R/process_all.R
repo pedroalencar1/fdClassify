@@ -2,7 +2,7 @@
 process_all <- function(df_d,include_variables = T, data = 'station'){
   ############################# process all menthods###########################
 
-  if (data = 'station'){
+  if (data == 'station'){
   #0. Evapotranspirations
   ET0 <- penman_day(vtime = df_d$time, vwind = df_d$wind_speed,
                     vvpd = df_d$vapor_p_def, vtemp = df_d$temperature,
@@ -54,7 +54,7 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
                          threshold = 20)
   print('Osman et al.: Done')
 
-  } else if (data = 'reanalysis'){
+  } else if (data == 'reanalysis'){
 
 
     fd_Mo <- Mo2016(vtime = df_d$time, vprecipitation = df_d$tp,
@@ -118,7 +118,7 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
 
   complete_series <- dplyr::left_join(dates,is.fd_mo, by= 'time') %>%
     dplyr::left_join(is.fd_ford, by= 'time') %>%
-    dplyr::left_join(is.fd_pendergrass, by= 'tim e') %>%
+    dplyr::left_join(is.fd_pendergrass, by= 'time') %>%
     dplyr::left_join(is.fd_noguera, by= 'time') %>%
     dplyr::left_join(is.fd_christian, by= 'time') %>%
     dplyr::left_join(is.fd_osman, by= 'time')
