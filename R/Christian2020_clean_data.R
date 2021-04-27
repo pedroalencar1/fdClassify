@@ -50,6 +50,9 @@ Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
   ## 1) identify NA values and occurrence of consecutive pentads with NA
   series.esr$isna <- 0
 
+  series.esr$var[is.na(series.esr$var)] <- NA
+
+
   for (i in 2:(nrow(series.esr))){
     if (is.na(series.esr$var[i])){
       series.esr$isna[i] = 1
@@ -80,7 +83,11 @@ Christian2020_clean_data <- function(vtime, vET0, vETa, threshold = 1){
   aux_count <- max(series.esr$isna) #if larger than 1 there are consecutive pentads
   # with NaN
 
-  for (i in 2:(nrow(series.esr)-1)){
+  #limits of interpolation
+  NA_beg <- min(which(!is.na(series.esr$var)))
+  NA_end <- max(which(!is.na(series.esr$var)))
+
+  for (i in NA_beg:NA_end){
     if (is.na(series.esr$var[i])){
       # calculates the interpolation increments
       aux_na <- series.esr$isna[i]

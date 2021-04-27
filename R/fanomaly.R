@@ -7,5 +7,7 @@ f.anomaly <- function(vector){
   idx <- !(sapply(v.anomaly, length))
   v.anomaly[idx] <- NA
   v.anomaly <- unlist(v.anomaly)
+
+  # return(v.anomaly)
 }
 

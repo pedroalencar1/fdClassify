@@ -28,7 +28,11 @@ Noguera2020 <- function(vtime, vprecipitation, vet0, threshold = NA){
   #get onset
   spei$is.fd <- (spei$dif <= -2)*(spei$spei <= threshold)
 
-  fd.info <- spei[complete.cases(spei),]
+  # fd.info <- spei[complete.cases(spei),]
+  # fd.info$is.fd[1:3] <- 0 # fix issue for events identified to early in the series
+
+  fd.info <- spei
+  fd.info[is.na(fd.info)] <- 0 #get complete series and fill Na with 0
 
   # get complete event
   for (i in 2:nrow(fd.info)){

@@ -1,8 +1,8 @@
-\name{get_df_era}
-\alias{get_df_era}
+\name{get_df_era5}
+\alias{get_df_era5}
 \title{function to build dataframe from era5 ncfiles.}
 \usage{
-  prepare(list_files, lat, lon, soil_layers = c(1))
+  get_df_era5(list_files, lat, lon, soil_layers = c(1))
 }
 
 \description{
@@ -17,5 +17,5 @@
 }
 
 \examples{
-  get_df_era(list_files, lat, lon, soil_layers = c(1))
+  get_df_era5(list_files, lat, lon, soil_layers = c(1))
 }

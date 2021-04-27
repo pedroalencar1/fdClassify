@@ -6,6 +6,7 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
   crit2 = crit[2] #lower limit
   crit3 = crit[3] # recuperation limit
 
+
   swc <- data.frame(time = vtime, swc = vswc)
 
   #get pentads
@@ -13,6 +14,7 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
                               na_rm = F, f = mean)
   series.swc <- pentad.swc.list$pentad_timestamp
   pentad.swc <- pentad.swc.list$pentad_matrix
+
 
   # get percentiles
   percentile.swc <- t(apply(pentad.swc,1, f.percentile))
@@ -22,7 +24,8 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
 
   #remove NA from the beggining of the series. Necessary for p.min calculation.
   firstNonNA <- min(which(!is.na(percentile.series)))
-  percentile.series <- percentile.series[firstNonNA:length(percentile.series)]
+  lastNonNA <- max(which(!is.na(percentile.series)))
+  percentile.series <- percentile.series[firstNonNA:lastNonNA]
 
   #get accumulated difference from 1 to 4 pentads.
   a1 <- diff(percentile.series, lag = 1)  %>%  c(rep(100,1),.)
@@ -35,7 +38,6 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
   data.table$a.min <- sapply(1:nrow(data.table), function(i) min(data.table[i,2:5],na.rm = T))
   data.table$p.min <- rbind(NA,as.data.frame(unlist(sapply(2:nrow(data.table),
                                                            function(i) which.max(data.table$a.min[i] - data.table[i,2:5])))))
-
   colnames(data.table[,7]) <- 'p.min'
 
   #Classification -- branchless style
@@ -70,7 +72,7 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
 
   }
   #get dates from SWC series
-  data.table$date <- series.swc$time[firstNonNA:nrow(series.swc)]
+  data.table$date <- series.swc$time[firstNonNA:lastNonNA]
 
   fd.summary <- data.table[data.table$fd == 1,] %>%
     dplyr::select(date,event,dur, percentile.series,a.min)
@@ -89,28 +91,33 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
     i <- i + 1
   }
 
-  ts.fd <- rbind(matrix(NA,ncol = 1, nrow =firstNonNA - 1), matrix(data.table$is.fd,ncol = 1))
-  nrow(ts.fd)
+  ts.fd <- rbind(matrix(NA,ncol = 1, nrow =firstNonNA - 1), matrix(data.table$is.fd,ncol = 1),
+                 matrix(NA, ncol = 1, nrow = (nrow(series.swc)-lastNonNA)))
+
   # get series of 20 and 40 percentiles for visualization
   n_years <- max(lubridate::year(series.swc$time)) - min(lubridate::year(series.swc$time)) + 1
   p20 <- NA
   p40<- NA
+  p50<- NA
   for (i in 1:73){
     p20[i] <- quantile(pentad.swc[i,], probs = 0.2, na.rm = T)
     p40[i] <- quantile(pentad.swc[i,], probs = 0.4, na.rm = T)
+    p50[i] <- quantile(pentad.swc[i,], probs = 0.5, na.rm = T)
   }
   p20_series <- rep(p20,n_years)
   p40_series <- rep(p40,n_years)
+  p50_series <- rep(p50,n_years)
 
   series.swc$p20 <- p20_series
   series.swc$p40<- p40_series
+  series.swc$p50<- p50_series
 
-  percentile.series <- c(rep(NA,firstNonNA-1),percentile.series) #recompose length percentile series
+  percentile.series <- c(rep(NA,firstNonNA-1),percentile.series,rep(NA,nrow(series.swc)-lastNonNA)) #recompose length percentile series #
+
 
   swc_series <- cbind(series.swc,percentile.series, ts.fd)
 
-  colnames(swc_series) <- c('time','SWC','p20','p40', 'p.SWC', 'is.fd')
-
+  colnames(swc_series) <- c('time','SWC','p20','p40', 'p50', 'p.SWC', 'is.fd')
 
   output <- list('SWC_timeseries' = swc_series, 'FD_info' = fd.summary)
 

@@ -33,7 +33,7 @@ get.nc.data <- function(my_lon,my_lat,my_filename,vname, file = T){
     one_data <- data.frame("date"=new_time, "value"=as.vector(pixel_data))
     if (i==1) all_data <- one_data else all_data <- rbind(all_data, one_data)
     # close nc file
-    nc_close(ncin)
+    ncdf4::nc_close(ncin)
   }
 
   if (file){

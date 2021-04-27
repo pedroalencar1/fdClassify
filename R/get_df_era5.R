@@ -21,8 +21,12 @@ get_df_era5 <- function(list_files, lat, lon, soil_layers = c(1)){
   colnames(df) <- c('time', list_var)
   df$tp <- df$tp*1000 # convert to mm
   df$t2m <- df$t2m - 273.15 # convert to degrees C
-  df$pev <- df$pev*1000 # convert to mm
-  df$e <- df$e*1000 # convert to mm
+  df$pev <- -df$pev*1000 # convert to mm and adjust direction
+  df$e <- -df$e*1000 # convert to mm and adjust direction
+
+  #remove negative values
+  df$pev[df$pev < 0] <- 0
+  df$e[df$e < 0] <- 0
 
   #convert soil moisture to percentage
   for (i in 1:length(soil_layers)){
@@ -37,10 +41,17 @@ get_df_era5 <- function(list_files, lat, lon, soil_layers = c(1)){
   # get daily data
   df_day_era <- prepare.nc(df[,c(1,2)], period = 'day', f = sum)[,1]
 
-  # tp, pev, e
-  for ( i in 1:3){
-    df_day_era[,i+1] <- prepare.nc(df[,c(1,i+1)], period = 'day', f = sum)[,2]
-  }
+  # if (database == 'land'){ #ERA5-land accumulates precipitation and evaporation over the day!
+  #   # tp, pev, e
+  #   for ( i in 1:3){
+  #     df_day_era[,i+1] <- prepare.nc(df[,c(1,i+1)], period = 'day', f = max)[,2]
+  #   }
+  # } else {
+    # tp, pev, e
+    for ( i in 1:3){
+      df_day_era[,i+1] <- prepare.nc(df[,c(1,i+1)], period = 'day', f = sum)[,2]
+    }
+  # }
 
   # t2m, swvl's
   for ( i in 4:length(list_var)){
