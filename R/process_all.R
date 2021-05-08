@@ -54,6 +54,15 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
                            threshold = 20)
     print('Osman et al.: Done')
 
+    # 7. Alencar et al. 2021
+
+    fd_Alencar <- alencar2021(vtime = df_d$time,
+                              vprecipitation = df_d$precipitation,
+                              vet0 = ET0$et0)
+
+    print('Alencar et al.: Done')
+
+
   } else if (data == 'reanalysis'){
     #get new columns for output
     df_d$soil_water <- df_d$swvl1
@@ -110,6 +119,13 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
                            threshold = 20)
     print('Osman et al.: Done')
 
+
+    # 7. Alencar et al. 2021
+    fd_Alencar <- alencar2021(vtime = df_d$time,
+                              vprecipitation = df_d$tp,
+                              vet0 = df_d$pev)
+    print('Alencar et al: Done')
+
   } else {'no valid dataset'}
 
   ############################# joint dataframe ###########################
@@ -129,6 +145,8 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
                                 christian = fd_Christian[[1]]$is.fd)
   is.fd_osman <- data.frame(time = as.Date(fd_Osman[[1]]$time),
                             osman = fd_Osman[[1]]$is.fd)
+  is.fd_alencar <- data.frame(time = as.Date(fd_Alencar[[1]]$Date),
+                            osman = fd_Alencar[[1]]$is.fd)
 
   #get anomalies
 
@@ -167,6 +185,7 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
     dplyr::left_join(is.fd_noguera, by= 'time') %>%
     dplyr::left_join(is.fd_christian, by= 'time') %>%
     dplyr::left_join(is.fd_osman, by= 'time') %>%
+    dplyr::left_join(is.fd_alencar, by= 'time') %>%
     dplyr::left_join(anom_et0, by= 'time') %>%
     dplyr::left_join(anom_eta, by= 'time') %>%
     dplyr::left_join(anom_temp, by= 'time') %>%
@@ -200,8 +219,9 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
   colnames(complete_series) <- c('time', 'Mo and Lettenmeier',
                                  'Ford and Labosier', 'Pendergrass et al.',
                                  'Noguera et al.','Christian et al.',
-                                 'Osman et al.', 'et0_anomaly', 'eta_anomaly'
-                                 , 'temperature_anomaly', 'precipitation_anomaly')
+                                 'Osman et al.', 'Alencar et al.',
+                                 'et0_anomaly', 'eta_anomaly',
+                                 'temperature_anomaly', 'precipitation_anomaly')
 
 
 
@@ -219,13 +239,18 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
     SPEI <- data.frame(time = fd_noguera[[1]]$time, spei = fd_noguera[[1]]$spei)
     SESR <- data.frame(time = as.Date(fd_Christian[[1]]$time), sesr = fd_Christian[[1]]$sesr_value)
     EDDI <- data.frame(time = fd_Pendergrass[[1]]$time, eddi = fd_Pendergrass[[1]]$percentile)
+    an_slope_prec <- data.frame(time = as.Date(fd_Alencar[[1]]$Date), an_slope_prec = fd_Alencar[[1]]$anomaly_slope_prec  )
+    an_slope_et0 <- data.frame(time = as.Date(fd_Alencar[[1]]$Date), an_slope_et0 = fd_Alencar[[1]]$anomaly_slope_et0)
+
 
     complete_series <- dplyr::left_join(complete_series,swc_p20, by= 'time') %>%
       dplyr::left_join(swc_p40, by= 'time') %>%
       dplyr::left_join(swc_p50, by= 'time') %>%
       dplyr::left_join(SPEI, by= 'time') %>%
       dplyr::left_join(SESR, by= 'time') %>%
-      dplyr::left_join(EDDI, by= 'time')
+      dplyr::left_join(EDDI, by= 'time')%>%
+      dplyr::left_join(an_slope_prec, by= 'time') %>%
+      dplyr::left_join(an_slope_et0, by= 'time')
 
 
     #repeat the process of NA filling
@@ -258,7 +283,7 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
     colnames(complete_series) <- c('Date', 'Mo and Lettenmeier',
                                    'Ford and Labosier', 'Pendergrass et al.',
                                    'Noguera et al.','Christian et al.',
-                                   'Osman et al.',names[8:length(names)])
+                                   'Osman et al.', 'Alencar et al.',names[9:length(names)])
   } else{
     complete_series <- complete_series[,c(1:7)]
   }
@@ -268,7 +293,8 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
                        Pendergrass = fd_Pendergrass[[2]],
                        Noguera = fd_noguera[[2]],
                        Christian = fd_Christian[[2]],
-                       Osman = fd_Osman[[2]])
+                       Osman = fd_Osman[[2]],
+                       Alencar = fd_Alencar[[2]])
 
   output <- list(Series = complete_series, Summary = summary_list)
 
