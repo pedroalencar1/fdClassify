@@ -20,8 +20,8 @@ alencar2021 <- function(vtime, vprecipitation, vet0, crit = c(4, 2, 8, 2), month
   ###################################
 
   df <- data.frame(Date = vtime, precipitation = vprecipitation, et0 = vet0)
-# df$month <- lubridate::month(df$time)
-##########################
+  # df$month <- lubridate::month(df$time)
+  ##########################
 
   #get interval MAMJJASO
   df$precipitation[lubridate::month(df$Date) > months[2] | lubridate::month(df$Date) <  months[1]] <- NA
@@ -49,19 +49,19 @@ alencar2021 <- function(vtime, vprecipitation, vet0, crit = c(4, 2, 8, 2), month
 
 
   df_complete <- data.frame(Date = as.Date(week_series$time), precip = c(week_precipitation),
-                          et0 = c(week_et0),
-                          slope_precip = c(slope_4w_prec),
-                          slope_et0 = c(slope_4w_et0),
-                          anomaly_slope_prec = c(slope_anomaly_prec),
-                          anomaly_slope_et0 = c(slope_anomaly_et0),
-                          spei = spei)
+                            et0 = c(week_et0),
+                            slope_precip = c(slope_4w_prec),
+                            slope_et0 = c(slope_4w_et0),
+                            anomaly_slope_prec = c(slope_anomaly_prec),
+                            anomaly_slope_et0 = c(slope_anomaly_et0),
+                            spei = spei)
 
 
   #get events
   df_complete$spei_sign <- runner::runner(sign(df_complete$spei),sum, k = crit[3])
 
   df_complete$is.fd <- (df_complete$anomaly_slope_et0 - df_complete$anomaly_slope_prec >= crit[2])*
-                        (df_complete$spei_sign>(crit[4] - crit[3])) * (df_complete$spei <= -1)
+    (df_complete$spei_sign>(crit[4] - crit[3])) * (df_complete$spei <= -1)
 
   df_complete[is.na(df_complete)] <- 0
 
@@ -72,12 +72,27 @@ alencar2021 <- function(vtime, vprecipitation, vet0, crit = c(4, 2, 8, 2), month
     }
   }
 
-  # join events with one week interruption
-  for (i in 2:(nrow(df_complete)-1)){
-    if(df_complete$is.fd[i-1] == 1 & df_complete$is.fd[[i+1]] == 1){
-      df_complete$is.fd[i] <- 1
+
+  #join events that are 3 or less weeks apart
+  index_aux3 <- rle(df_complete$is.fd)$lengths
+  index_aux4 <- runner::runner(index_aux3, f = sum)
+
+  index_aux3 <- index_aux3[seq(1,length(index_aux3),2)]
+  index_aux4 <- index_aux4[seq(1,length(index_aux4),2)]
+
+  if (min(index_aux3) < 4){
+    length_short_breaks <- index_aux3[which(index_aux3 < 4)]
+    position_short_breaks <- index_aux4[which(index_aux3 < 4)]
+
+    for (i in 1:length(length_short_breaks)){
+      i = 1
+      beg_break <- position_short_breaks[i] - length_short_breaks[i] + 1
+      for (j in beg_break:position_short_breaks[i]){
+        df_complete$is.fd[j] <- 1
+      }
     }
   }
+
 
   #summary data frame
   fd_summary <- NULL
@@ -88,7 +103,6 @@ alencar2021 <- function(vtime, vprecipitation, vet0, crit = c(4, 2, 8, 2), month
   }
 
   output <- list(series = df_complete, summary = fd_summary)
-
   return(output)
 
 }

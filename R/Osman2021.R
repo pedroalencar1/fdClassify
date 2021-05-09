@@ -29,7 +29,6 @@ Osman2021 <- function(vtime, vswc, threshold = 20){
   swc_df$crit1 <- (swc_df$swc < swc_df$mvAvg_swc)*1
   # swc_df$crit1 <- (swc_df$swc < swc_df$mvAvg_swc)*(swc_df$percentile < 20)
 
-  View(swc_df)
   ########################## new classification
 
   # get positon events
@@ -44,22 +43,33 @@ Osman2021 <- function(vtime, vswc, threshold = 20){
   index_df <- index_df[index_df$length > 3,]
 
   #get events that reach 20 percentile
-
   for (i in 1:nrow(index_df)){
     index_df$beg[i] <- index_df$index[i] - index_df$length[i] + 1
     index_df$end[i] <- index_df$index[i]
 
-    if (min(swc_df$percentile[index_df$beg[i]:index_df$end[i]]) > 20){
+    if (min(swc_df$percentile[index_df$beg[i]:index_df$end[i]]) >= 20){
       index_df[i,] <- NA
     }
   }
 
   index_df <- index_df[complete.cases(index_df),] #this are events that reach 20p and respect the intensification rule
 
+  #remove events that are too short
+  for (i in 1:nrow(index_df)){
+    if (min(swc_df$percentile[(index_df$beg[i]+3):index_df$end[i]]) >= 20){
+      index_df[i,] <- NA
+    }
+  }
+  index_df <- index_df[complete.cases(index_df),] #this are events that reach 20p and respect the intensification rule
+
+
   index_df$onset <- 0
   for (i in 1:nrow(index_df)){
+    # print(i)
     swc_aux <- swc_df$percentile[(3+index_df$beg[i]):index_df$end[i]]
-    id_onset <- min(which(swc_aux<20))
+
+
+    id_onset <- min(which(swc_aux<=20))
     index_df$onset[i] <- 3+index_df$beg[i] + id_onset - 1
 
     if (max(swc_aux[id_onset:length(swc_aux)])>= 20){ #the event ends before the current end
@@ -93,13 +103,16 @@ Osman2021 <- function(vtime, vswc, threshold = 20){
   index_aux3 <- index_aux3[seq(1,length(index_aux3),2)]
   index_aux4 <- index_aux4[seq(1,length(index_aux4),2)]
 
-  length_short_breaks <- index_aux3[which(index_aux3 < 4)]
-  position_short_breaks <- index_aux4[which(index_aux3 < 4)]
+  if (min(index_aux3) < 4){
+    length_short_breaks <- index_aux3[which(index_aux3 < 4)]
+    position_short_breaks <- index_aux4[which(index_aux3 < 4)]
 
-  for (i in 1:length(length_short_breaks)){
-    beg_break <- position_short_breaks[i] - length_short_breaks[i] + 1
-    for (j in beg_break:position_short_breaks[i]){
-      swc_df$is.fd[j] <- 1
+    for (i in 1:length(length_short_breaks)){
+      i = 1
+      beg_break <- position_short_breaks[i] - length_short_breaks[i] + 1
+      for (j in beg_break:position_short_breaks[i]){
+        swc_df$is.fd[j] <- 1
+      }
     }
   }
 
