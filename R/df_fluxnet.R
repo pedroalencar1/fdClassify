@@ -9,7 +9,7 @@
 #'
 #' @examples
 #'
-df_fluxnet <- function(filename, timestep, soil_level = 1){
+get_df_fluxnet <- function(filename, timestep, soil_level = 1){
 
   #read csv file
   station <- utils::read.csv(filename)

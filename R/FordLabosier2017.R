@@ -48,7 +48,7 @@ FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
     data.table$fd[i] <- (data.table$percentile.series[i] <= crit2) *
       # (data.table$a.min[i] <= crit2 - crit1) *
       (data.table$percentile.series[i-data.table$p.min[i]] >= crit1)*
-      (max(data.table$percentile.series[(i+1):(i+4)]) <= crit3)
+      (max(data.table$percentile.series[(i+1):(i+3)]) <= crit3)
 
     if ((data.table$fd[i-1] == 1) & (data.table$fd[i] == 1)){
       data.table$fd[i-1] <- 0

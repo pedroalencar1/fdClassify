@@ -1,3 +1,14 @@
+#' Standard Precipitation Evaporation Index calculation
+#'
+#' @param vtime a data.frame column or vector with daily time stamps (Date type)
+#' @param vdeficit a data.frame column or vector with daily hydrological deficit
+#' obtained by the difference of precipitation and potential evapotranspitation (P - ET0)
+#' @param n a natural number that indicates the accumulation time
+#'
+#' @return
+#' @export
+#'
+#' @examples
 f.spei <- function(vtime, vdeficit, n){
 
   nyear <- max(lubridate::year(vtime)) - min(lubridate::year(vtime)) + 1

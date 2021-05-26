@@ -1,3 +1,33 @@
+#' FD identification by Pendergrass et al. (2021)
+#'
+#' @description
+#' Identifies Flash Drougt evetns using EDDI variations, as described in
+#' Pendergrass et al. "Flash droughts present a new challenge for
+#' subseasonal-to-seasonal prediction", 2021.
+#'
+#'
+#' @param vtime a data.frame column or vector with daily time stamps (Date type)
+#' @param vet0 a data.frame column or vector with ordered daily ET0 values. They
+#' can be obtained directly from reanalysis/models or from the functions
+#' \code{penman_day} or \code{hargreaves_day}
+#' @param limit.down a numeric value, indicating the limit of recuperation after
+#' onset. This criterion is additional, to flexibilise the original method.
+#' We set it's value to 10 as default. TO run the original method (more restrict)
+#' define it to 0.
+#'
+#' @details
+#' This function is based on EDDI calculated according to Hobbings et al. (2016)
+#' DOI: 10.1175/jhm-d-15-0121.1
+#' It uses a simple empirical Tukey plotting position to assess EDDI percentiles.
+#'
+#' @return
+#' Function \code{Pendergrass2020} retuns a list with two data frames.
+#' 1) a complete time stamped series containing relevant variables and FD events;
+#' 2) a summary of each event with its duration and interval of occurance.
+#'
+#' @export
+#'
+#' @examples
 Pendergrass2020 <- function(vtime, vet0, limit.down = 10){
 
   et0 <- data.frame(time = vtime, et0 = vet0)
@@ -12,7 +42,8 @@ Pendergrass2020 <- function(vtime, vet0, limit.down = 10){
   # get percentiles
   # we used the here the percentiles of EDDI as described in Hobbins 2016.
 
-  percentile.eddi <- t(apply(week.et0,1, eddi_percentile))
+  percentile.eddi <- eddi_percentile(vtime = series.et0$time,
+                                     vet0 = series.et0$var, dist = 'tukey')
 
   data.table <- data.frame(time = as.Date(series.et0$time),
                            percentile = c(percentile.eddi),
@@ -47,7 +78,7 @@ Pendergrass2020 <- function(vtime, vet0, limit.down = 10){
       data.table$is.fd[i-1] = 1
       # data.table$is.fd[i-2] = 1
       limit <- data.table$percentile[i] - limit.down
-      while (data.table$percentile[i+1] >= limit){
+      while (data.table$percentile[i+1] >= limit & i+1 <= nrow(data.table)){
         data.table$is.fd[i+1] <- 1
         i = i+1
       }
