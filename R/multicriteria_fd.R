@@ -145,8 +145,8 @@ multicriteria_fd <- function(vtime, vtemp, vprec, vet0, veta, score = 95,thresho
   df_criteria$et0_anomaly <- (df_criteria$et0_anomaly > thresholds[2])*1
   df_criteria$eta_anomaly <- (df_criteria$eta_anomaly > thresholds[2])*1
   df_criteria$spei <- (df_criteria$spei < thresholds[3])*1
-  df_criteria$eddi <- (df_criteria$spei > 100*pnorm(thresholds[2],0,1))*1
-  df_criteria$sesr <- (df_criteria$spei < -thresholds[2])*1
+  df_criteria$eddi <- (df_criteria$eddi > 100*pnorm(thresholds[2],0,1))*1
+  df_criteria$sesr <- (df_criteria$sesr < -thresholds[2])*1
 
   df_criteria$temp_anomaly_ac <- (df_criteria$temp_anomaly_ac > thresholds[4])*1
   df_criteria$prec_anomaly_ac <- (df_criteria$prec_anomaly_ac < -thresholds[4])*1
@@ -155,13 +155,13 @@ multicriteria_fd <- function(vtime, vtemp, vprec, vet0, veta, score = 95,thresho
 
   df_criteria$spei_dif <- (df_criteria$spei_dif < thresholds[5])*1
   df_criteria$sesr_dif <- (df_criteria$sesr_dif < thresholds[5])*1
-  df_criteria$eddi_dif1 <- (df_criteria$eddi_dif1 < thresholds[6])*1
-  df_criteria$eddi_dif2 <- ((df_week$eddi_dif2 - df_week$eddi_dif1) > -thresholds[7])*1
+  df_criteria$eddi_dif1 <- (df_criteria$eddi_dif1 < thresholds[6])
+  # df_criteria$eddi_dif2 <- ((df_week$eddi_dif2 - df_week$eddi_dif1) > -thresholds[7])*1
   df_criteria$sesr_dif_perc <- (df_criteria$sesr_dif_perc < thresholds[8])*1
 
   n_criteria <- ncol(df_criteria)-1
 
-  #get scores and percentiles
+    #get scores and percentiles
   df_criteria$score <- rowSums(df_criteria[,2:ncol(df_criteria)], na.rm = T)/n_criteria
   df_criteria$score_percentile_global <- f.percentile(df_criteria$score)
   df_criteria$score_percentile_period <- c(t(apply(matrix(df_criteria$score,
