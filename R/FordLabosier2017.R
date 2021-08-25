@@ -1,5 +1,19 @@
-## function to identify FD based on Ford and Laboiser 2017
-
+#' @title Method of Ford and Labosier (2017)
+#'
+#' @description
+#' This function follows the description contained in the original paper. We have as additional criterion that FD should have at least 3 pentads with SM lower than 30th percentile (as proposed by Dr. Ford in personal communication).
+#'
+#' @param vtime data frame column or vector containing \code{date} data
+#' @param vswc data frame column or vector containing soil water content values
+#' @param crit a vector of three value (default \code{c(20,40,30)}) indicating the model thresholds for lower, upper and persistance limits for SWC percentiles.
+#'
+#' @return A list with two data frames, one a time series with all data for FD identification, and the second with a summary of FD events.
+#' @export
+#'
+#' @examples
+#' FD_events <- FordLabosier2017(de_tha_d$time, de_tha_d$soil_water, crit = c(40,20,30))
+#'
+#'
 FordLabosier2017 <- function(vtime, vswc, crit = c(40,20,30)){
 
   crit1 = crit[1] #upper limit

@@ -1,5 +1,26 @@
+#' @title FD identification based on Noguera et al. (2020)
+#'
+#' @param vtime data frame column or vector containing \code{date} data
+#' @param vprecipitation data frame column or vector containing daily precipitation
+#' @param vet0 data frame column or vector containing daily ET0 (potential evapotranspiration). It can be obtained with the function \code(penman_day)
+#' @param threshold numeric, indicate the lower limit to identify a FD (see description)
+#'
+#' @description The function uses the SPEI to identify a FD. The intentisication period is defined by a 4 week (one month) period with a SPEI reduction of 2. The SPEI value must go equal or below the threshold.
+#' If \code{threshold} is not provided -1.28 (10 % quantile in a normal distribution) is assigned.
+#'
+#' @return The function returns a list with two data frames. One with weekly and detailed values from the function and a second with a summary of all events identified.
+#'
+#' @export
+#' ET0 <- penman_day(vtime = df_d$time, vwind = df_d$wind_speed,
+#'                   vvpd = df_d$vapor_p_def, vtemp = df_d$temperature,
+#'                   vheatflux = (df_d$sensible_heat + df_d$latent_heat))
+#'
+#' fd_noguera <- Noguera2020(vtime = df_d$time,
+#'                           vprecipitation = df_d$precipitation,
+#'                           vet0 = ET0$et0)
+#'
+#' @examples
 Noguera2020 <- function(vtime, vprecipitation, vet0, threshold = NA){
-
 
   deficit <- data.frame(time = vtime, deficit = vprecipitation - vet0)
 

@@ -38,8 +38,6 @@
 #'
 #'
 #' @return
-#' The function returns a list with two data frames. One with weekly and detailed values from the function and a second with a summary of all events identified.
-#'
 #' @export
 #'
 #' @examples
@@ -53,23 +51,16 @@
 #'
 #'
 
-multicriteria_fd <- function(vtime, vtemp, vprec, vet0, veta, score = 0.6, d_score = 0.2,thresholds = c(1, 0, 0, 0, -2, 50, 10, 30)){
 
+multicriteria_fd <- function(vtime, vtemp, vprec, vet0, veta, score = 0.7,thresholds = c(1.1, 1, -1.28, 3, -2, 50, 10, 30)){
 
-  ##### test data
-
-  # df_d <- de_tha_d
-  # score = 0.6
-  # d_score = 0.2
-  # thresholds = c(1, 0, 0, 0, -2, 50, 10, 30)
+  # ET0 <- penman_day(vtime = de_tha_d$time, vwind = de_tha_d$wind_speed, vtemp = de_tha_d$temperature,
+  #                   vvpd = de_tha_d$vapor_p_def, vheatflux = (de_tha_d$sensible_heat + de_tha_d$latent_heat))[,2]
+  # ETa <- actual_evap_day(vtime = de_tha_d$time,vlatent_heat =de_tha_d$latent_heat, vtemperature = de_tha_d$temperature)[,2]
   #
-  # ET0 <- penman_day(vtime = df_d$time, vwind = df_d$wind_speed, vtemp = df_d$temperature,
-  #                   vvpd = df_d$vapor_p_def, vheatflux = (df_d$sensible_heat + df_d$latent_heat))[,2]
-  # ETa <- actual_evap_day(vtime = df_d$time,vlatent_heat =df_d$latent_heat, vtemperature = df_d$temperature)[,2]
-  #
-  # vtime = df_d$time
-  # vtemp = df_d$temperature
-  # vprec = df_d$precipitation
+  # vtime = de_tha_d$time
+  # vtemp = de_tha_d$temperature
+  # vprec = de_tha_d$precipitation
   # vet0 = ET0
   # veta = ETa
 
@@ -120,14 +111,14 @@ multicriteria_fd <- function(vtime, vtemp, vprec, vet0, veta, score = 0.6, d_sco
   #EDDI
   df_week$eddi <- c(eddi_percentile(vtime = df_week$time,
                                     vet0 = df_week$et0, dist = 'tukey')
-  )
+                    )
 
 
   #SESR
   sesr_input_clean <- Christian_clean_data_week(vtime = df_day$time,
-                                                vET0 = df_day$et0,
-                                                vETa = df_day$eta,
-                                                threshold = thresholds[1])
+                                                    vET0 = df_day$et0,
+                                                    vETa = df_day$eta,
+                                                    threshold = thresholds[1])
 
   df_week$sesr <- sesr_input_clean[[1]]$var
 
@@ -140,124 +131,89 @@ multicriteria_fd <- function(vtime, vtemp, vprec, vet0, veta, score = 0.6, d_sco
   df_week$eta_anomaly_ac <- runner::runner(df_week$eta_anomaly, k = 4, f = sum)
   df_week$spei_dif <- c(rep(NA, n_weeks),diff(df_week$spei, lag = n_weeks))
   df_week$eddi_dif1 <- c(rep(NA, n_weeks-2),diff(df_week$eddi, lag = n_weeks-2))
+  df_week$eddi_dif2 <- c(rep(NA, n_weeks),diff(df_week$eddi, lag = n_weeks))
   df_week$sesr_dif <- c(rep(NA, n_weeks),diff(df_week$sesr, lag = n_weeks))
 
   #delta.SESR percentiles
-  df_week$sesr_dif_perc <- c(t(apply(matrix(df_week$sesr_dif, nrow = 52, byrow = F),1, f.percentile)))
+   df_week$sesr_dif_perc <- c(t(apply(matrix(df_week$sesr_dif, nrow = 52, byrow = F),1, f.percentile)))
 
   #criteria
-
-  criteria_names <- c('time', 'temp_anomaly', 'prec_anomaly', 'et0_anomaly', 'eta_anomaly',
-                      'spei', 'sesr', 'eddi',
-                      'prec_anomaly_ac','et0_anomaly_ac','temp_anomaly_ac',
-                      'spei_dif', 'eddi_dif1', 'sesr', 'sesr_dif_perc', 'sesr_dif')
-
-
-  df_criteria <- df_week[colnames(df_week) %in% criteria_names]
+  df_criteria <- df_week[,c(1,6:ncol(df_week))]
 
   df_criteria$temp_anomaly <- (df_criteria$temp_anomaly > thresholds[2])*1
   df_criteria$prec_anomaly <- (df_criteria$prec_anomaly < -thresholds[2])*1
   df_criteria$et0_anomaly <- (df_criteria$et0_anomaly > thresholds[2])*1
   df_criteria$eta_anomaly <- (df_criteria$eta_anomaly > thresholds[2])*1
   df_criteria$spei <- (df_criteria$spei < thresholds[3])*1
-  df_criteria$eddi <- (df_criteria$eddi > 100*pnorm(thresholds[2],0,1))*1 #
-  df_criteria$sesr <- (df_criteria$sesr < thresholds[2])*1 #
+  df_criteria$eddi <- (df_criteria$eddi > 100*pnorm(thresholds[2],0,1))*1
+  df_criteria$sesr <- (df_criteria$sesr < -thresholds[2])*1
 
   df_criteria$temp_anomaly_ac <- (df_criteria$temp_anomaly_ac > thresholds[4])*1
-  df_criteria$prec_anomaly_ac <- (df_criteria$prec_anomaly_ac < thresholds[4])*1
+  df_criteria$prec_anomaly_ac <- (df_criteria$prec_anomaly_ac < -thresholds[4])*1
   df_criteria$et0_anomaly_ac <- (df_criteria$et0_anomaly_ac > thresholds[4])*1
-  # df_criteria$eta_anomaly_ac <- (df_criteria$eta_anomaly_ac > thresholds[4])*1
+  df_criteria$eta_anomaly_ac <- (df_criteria$eta_anomaly_ac > thresholds[4])*1
 
   df_criteria$spei_dif <- (df_criteria$spei_dif < thresholds[5])*1
-  df_criteria$sesr_dif <- (df_criteria$sesr_dif < thresholds[5])*1 #
-  df_criteria$eddi_dif1 <- (df_criteria$eddi_dif1 < thresholds[6])*1
-  df_criteria$sesr_dif_perc <- (df_criteria$sesr_dif_perc < thresholds[8])*1 #
+  df_criteria$sesr_dif <- (df_criteria$sesr_dif < thresholds[5])*1
+  df_criteria$eddi_dif1 <- (df_criteria$eddi_dif1 < thresholds[6])
+  # df_criteria$eddi_dif2 <- ((df_week$eddi_dif2 - df_week$eddi_dif1) > -thresholds[7])*1
+  df_criteria$sesr_dif_perc <- (df_criteria$sesr_dif_perc < thresholds[8])*1
+
   n_criteria <- ncol(df_criteria)-1
 
-  # hist(df_criteria$score)
-  #     #get scores and percentiles
+    #get scores and percentiles
   df_criteria$score <- rowSums(df_criteria[,2:ncol(df_criteria)], na.rm = T)/n_criteria
   df_criteria$score_percentile_global <- f.percentile(df_criteria$score)
   df_criteria$score_percentile_period <- c(t(apply(matrix(df_criteria$score,
                                                           nrow = 52, byrow = F),1,
                                                    f.percentile)))
-  # ncol(df_criteria)
-  # View(df_criteria)
 
-  # classify as event
-  df_events <- df_criteria[,c(1,16,17,18)]
-
+  #classify as event
+  df_events <- df_criteria[,c(1,18,19)]
   # df_events$is.fd <- (df_events$score_percentile_global > score)*1
-  diffs <- data.frame(time = df_events$time)
+  df_events$is.fd <- (df_events$score > score)*1
 
-  diffs$d1 <- c(0,diff(df_events$score, lag = 1))
-  diffs$d2 <- c(0,0,diff(df_events$score, lag = 2))
-  diffs$d3 <- c(0,0,0,diff(df_events$score, lag = 3))
 
-  df_events$d_max <- apply(diffs[,2:4], 1, max) #get intensification
-  df_events$p_max <- apply(diffs[,2:4], 1, which.max) # get intensification duration
-  df_events$is.fd <- (df_events$score > score)*(df_events$d_max > d_score)
 
-  # removes winter events
-  df_events$is.fd[lubridate::month(df_events$time) %in% c(1,2,11,12)] <- 0
-
-  #get correct length of the event (allow one week of recuperation (like christian))
-  i = 1
-  while (i < (nrow(df_events)-1)){
-    if ((df_events$is.fd[i] == 1 & df_events$score[i+1] > score) | (df_events$is.fd[i] == 1 & df_events$score[i+2] > score)){
-      df_events$is.fd[i+1] <-1
-    }
-    i <- i+1
-  }
-
-  # remove too short events (single week)
-  for (i in 2:(nrow(df_events) - 1)){
-    if (df_events$is.fd[i] == 1){
-      df_events$is.fd[i] <- max(df_events$is.fd[i-1], df_events$is.fd[i+1])
-    }
-  }
-
-  # add intensification period into event length
   for (i in 1:nrow(df_events)){
+    if (lubridate::month(df_events$time[i]) %in% c(1,2,11,12)){
+      df_events$is.fd[i] <- 0
+    }
+
     if (df_events$is.fd[i] == 1){
-      df_events$is.fd[(i-df_events$p_max[i]):(i-1)] <- 1
+      df_events$is.fd[(i-3):(i-1)] <- 1
     }
   }
 
+  #join events that are 3 or less weeks apart
   index_aux3 <- rle(df_events$is.fd)$lengths
   index_aux4 <- runner::runner(index_aux3, f = sum)
 
   onset <- index_aux4[seq(0,length(index_aux4),2)]
   duration <- index_aux3[seq(0,length(index_aux3),2)]
 
-  #join events that are 3 or less weeks apart
+  index_aux3 <- index_aux3[seq(1,length(index_aux3),2)]
+  index_aux4 <- index_aux4[seq(1,length(index_aux4),2)]
 
-  # index_aux3 <- index_aux3[seq(1,length(index_aux3),2)]
-  # index_aux4 <- index_aux4[seq(1,length(index_aux4),2)]
-  #
-  # if (min(index_aux3) < 4){
-  #   length_short_breaks <- index_aux3[which(index_aux3 < 4)]
-  #   position_short_breaks <- index_aux4[which(index_aux3 < 4)]
-  #
-  #   for (i in 1:length(length_short_breaks)){
-  #     i = 1
-  #     beg_break <- position_short_breaks[i] - length_short_breaks[i] + 1
-  #     for (j in beg_break:position_short_breaks[i]){
-  #       df_events$is.fd[j] <- 1
-  #     }
-  #   }
-  # }
+  if (min(index_aux3) < 4){
+    length_short_breaks <- index_aux3[which(index_aux3 < 4)]
+    position_short_breaks <- index_aux4[which(index_aux3 < 4)]
+
+    for (i in 1:length(length_short_breaks)){
+      i = 1
+      beg_break <- position_short_breaks[i] - length_short_breaks[i] + 1
+      for (j in beg_break:position_short_breaks[i]){
+        df_events$is.fd[j] <- 1
+      }
+    }
+  }
 
   # View(df_events)
   #get summary data frame
   fd.summary <- df_events[onset,]
-
-  if (nrow(fd.summary > 0)){
-
-    fd.summary$duration <- duration
-    fd.summary$event <- 1:nrow(fd.summary)
-    fd.summary$is.fd <- NULL
-  }
+  fd.summary$duration <- duration
+  fd.summary$event <- 1:nrow(fd.summary)
+  fd.summary$is.fd <- NULL
 
 
   df_complete_data <- dplyr::left_join(df_week, df_events, by = 'time')
@@ -270,18 +226,16 @@ multicriteria_fd <- function(vtime, vtemp, vprec, vet0, veta, score = 0.6, d_sco
 
 }
 
+  # ggplot(df_criteria, aes(x = 1,y = score))+
+  #   geom_violin()+
+  #   geom_jitter(shape=16, position=position_jitter(0.15))
+  #
+  # ggplot(df_criteria, aes(x = time,y = score))+
+  #   geom_point()
+  #
+  # ggplot(df_events, aes(x = time))+
+  #   geom_point(aes(y= score))+
+  #   geom_bar(aes(weight = is.fd))
 
-#
-# ggplot(df_criteria, aes(x = 1,y = score))+
-#   geom_violin()+
-#   geom_jitter(shape=16, position=position_jitter(0.15))
-#
-# ggplot(df_criteria, aes(x = time,y = score))+
-#   geom_point()
-#
-# ggplot(df_events, aes(x = time))+
-#   geom_point(aes(y= score))+
-#   geom_bar(aes(weight = is.fd))
-#
-#
-#
+
+

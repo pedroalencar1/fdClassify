@@ -3,9 +3,12 @@
 #' @param vtime a data.frame column or vector with daily time stamps (Date type)
 #' @param vdeficit a data.frame column or vector with daily hydrological deficit
 #' obtained by the difference of precipitation and potential evapotranspitation (P - ET0)
-#' @param n a natural number that indicates the accumulation time
+#' @param n a natural number that indicates the accumulation time (pentad, week, month, etc)
 #'
-#' @return
+#' @return The function return a list with two elements. One data frame with time stamped pentad values and a matrix with years organized in columns.
+#'
+#' @description Internal funciton to calculate the SPEI
+#'
 #' @export
 #'
 #' @examples

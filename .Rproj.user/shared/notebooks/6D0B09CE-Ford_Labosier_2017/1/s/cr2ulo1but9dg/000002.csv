@@ -1,4 +1,0 @@
-"0","plot(ts.spi)+lines(-5 + ts.fd*100,col = 'grey')
-"
-"1","integer(0)
-"

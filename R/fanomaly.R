@@ -1,5 +1,16 @@
 ################### BASIC FUNCTIONS ###########################################
 
+#' @title Function to calculate anomalies
+#'
+#' @param vector A general vector or data frame column
+#'
+#' @description Calculates the anomaly (number of standard deviations). This is an intern function.
+#'
+#' @return vector of anomalies.
+#'
+#' @export
+#'
+#' @examples
 f.anomaly <- function(vector){
   v.anomaly <- NULL
   v.anomaly <- sapply(1:length(vector),FUN = function(i)

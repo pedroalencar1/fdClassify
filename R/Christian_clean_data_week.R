@@ -1,4 +1,25 @@
-# Function to clean the ESR data
+
+#' Function to clean the ESR data (necessary before running Christian et al. method)
+#'
+#' @param vtime data frame column or vector containing \code{date} data
+#' @param vET0 data frame column or vector containing daily potential evapotranspiration (mm.day-1)
+#' @param vETa data frame column or vector containing daily actual evapotranspiration (mm.day-1)
+#' @param threshold a positive number, indicates the maximum ratio ETa/ET0 allowed.
+#'
+#' @details
+#' Due to data and modelling quality, eventualy ETa >> ET0, causing errors, particularly in cold days when ET0 ≈ 0.
+#' This function allows the reduction o distortions. Pentads discarded are interpolated.
+#'
+#' @return
+#' It returns a list with two elements. A data frame with time stamps and pentad ESR and a matrix with ESR data distributed in a 73 lines (pentads).
+#'
+#' @export
+#'
+#' @examples
+#' Christian2020_clean_data(vtime = df_d$time,
+#'                          vET0 = ET0$et0, vETa = ETa$eta,
+#'                          threshold = 1)
+#'
 Christian_clean_data_week <- function(vtime, vET0, vETa, threshold = 1){
 
 # vtime = df_day$time
@@ -6,14 +27,6 @@ Christian_clean_data_week <- function(vtime, vET0, vETa, threshold = 1){
 # vETa = df_day$eta
 # threshold = 1
 
-  # #load required packages
-  # library('tidyr')
-  # library('dplyr')
-  # library('readr')
-  # library('tibbletime')
-  # library('lubridate')
-  # library('stringr')
-  # library('runner')
 
   aux_year <- lubridate::year
 

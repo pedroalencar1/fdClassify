@@ -14,6 +14,12 @@
 #' @export
 #'
 #' @examples
+#' ET0 <- penman_day(vtime = df_d$time, vwind = df_d$wind_speed,
+#'                   vvpd = df_d$vapor_p_def, vtemp = df_d$temperature,
+#'                   vheatflux = (df_d$sensible_heat + df_d$latent_heat))
+#'
+#' percentiles_eddi <- eddi_percentile(vtime = de_tha_d$time, ET0$et0, dist = 'tukey')
+#'
 eddi_percentile <- function(vtime, vet0, dist = 'tukey'){
 
   nyear <- max(lubridate::year(vtime)) - min(lubridate::year(vtime)) + 1

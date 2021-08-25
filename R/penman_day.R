@@ -1,5 +1,23 @@
 ################### BASIC FUNCTIONS ###########################################
 
+#' @title penman_day - Daily ET0 using Penman-Monteith
+#'
+#' @param vtime data frame column or vector containing \code{date} data
+#' @param vwind data frame column or vector containing daily wind velocity
+#' @param vtemp data frame column or vector containing daily temperature
+#' @param vvpd data frame column or vector containing daily vapor pressure
+#' @param vheatflux data frame column or vector containing daily total heat flux (latent and sensible heat flux)
+#' @param altitude study area altitude in meters above sea level
+#'
+#' @return The function returns a data frame with time stamped daily potential evapotranspiration
+#'
+#' @export
+#'
+#' @examples
+#'  ET0 <- penman_day(vtime = de_tha_d$time, vwind = de_tha_d$wind_speed,
+#'                    vvpd = de_tha_d$vapor_p_def, vtemp = de_tha_d$temperature,
+#'                    vheatflux = (de_tha_d$sensible_heat + de_tha_d$latent_heat))
+#'
 penman_day <- function(vtime, vwind, vtemp, vvpd, vheatflux, altitude = 0) {
 
   #calculate the local pressure based on the altitude. If none is provided sea level is used.

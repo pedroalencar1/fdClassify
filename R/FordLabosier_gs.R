@@ -1,6 +1,7 @@
 
-#' Modified method of Ford and Labosier (2017)
+#' @title Modified method of Ford and Labosier (2017)
 #'
+#' @description
 #' Besides the additional duration criteria (at least 3 pentads under 30th p.)
 #' we also added two new criteria:
 #'    1. Events with onset out of the growing season (MAMJJASO) are not considered

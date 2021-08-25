@@ -1,12 +1,36 @@
 
+#' FD identificaiton method proposed by the Author (Pedro Alencar)
+#'
+#' @param vtime data frame column or vector containing \code{date} data
+#' @param vprecipitation data frame column or vector containing daily precipitation (mm.day-1)
+#' @param vet0 data frame column or vector containing daily potential evapotranspiration (Penman-Monteith - mm.day-1)
+#' @param crit a vector with four elements indicating the thresholds (more in details).
+#' @param months a vector with two elements, the first and last months in the analysis (definition of growing season)
+#'
+#' @details
+#' The method tracks the variation (slope) of the precipitation and potential evapotranspiration.
+#' It uses intra-year limits and the anomaly to the time series to identify exceptionally dry events.
+#'
+#' The \code{crit} vector contains 4 elements:
+#'     c1 = accumulation time for slope (in weeks) - Default = 4
+#'     c2 = threshold for combined anomaly (sum) - Default = 2
+#'     c3 = latency period of negative SPEI (in weeks) - Default = 8
+#'     c4 = allows positive SPEI over latency period - Default = 2
+#'
+#' @return
+#' The function returns a list with two data frames. One with weekly and detailed values from the function and a second with a summary of all evetns identified.
+#'
+#' @export
+#'
+#' @examples
+#' fd_Alencar <- alencar2021(vtime = df_d$time,
+#'                           vprecipitation = df_d$precipitation,
+#'                           vet0 = ET0$et0)
+#'
+#'
+
+
 alencar2021 <- function(vtime, vprecipitation, vet0, crit = c(4, 2, 8, 2), months = c(3,10)){
-
-  #crit = c(a1,a2,a3,a4)
-  #a1 = accumulation time for slope
-  #a2 = threshold for combined anomaly (sum)
-  #a3 = lantency period of negative SPEI
-  #a4 = allows positive spei over latency period
-
 
   ###### calculate SPEI #############
   deficit <- data.frame(time = vtime, deficit = vprecipitation - vet0)

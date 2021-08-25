@@ -1,5 +1,17 @@
 ################### BASIC FUNCTIONS ###########################################
 
+#' @title Percentile function
+#'
+#' @param vector data frame column or vector containing the analysed data
+#'
+#' @description Calculates the percentile. This is an intern function.
+#'
+#' @return The function return a vector with percentiles
+#'
+#' @export
+#'
+#' @examples
+#'
 f.percentile <- function(vector){
 
   v.percentile <- NULL

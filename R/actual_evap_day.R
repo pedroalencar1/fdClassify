@@ -1,6 +1,24 @@
 ################### BASIC FUNCTIONS ###########################################
-
-
+#' Calculate daily actual evaporation
+#'
+#' @param vtime data frame column or vector containing \code{date} data
+#' @param vlatent_heat data frame column or vector containing daily latent heat flux (W.m-2.day-1)
+#' @param vtemperature data frame column or vector containing daily average tempeature (Celcius)
+#'
+#' @return Data frame containing dates (daily) and evaporation (mm/day)
+#'
+#' @details
+#' The calculation is based on the description in "A short course in Cloud Physics" (Rogers and Yau, 1989)
+#'
+#' @export
+#'
+#' @examples
+#' ETa <- actual_evap_day(vtime = de_tha_d$time,
+#'                        vlatent_heat =de_tha_d$latent_heat,
+#'                        vtemperature = de_tha_d$temperature)
+#'
+#'
+#'
 actual_evap_day <- function(vtime, vlatent_heat, vtemperature = 20){
 
   latent_d <- (2500.96 - 2.37*vtemperature)*1000

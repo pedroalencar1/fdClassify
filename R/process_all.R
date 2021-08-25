@@ -8,8 +8,11 @@
 #' @param data string value, either 'station' or 'reanalysis'.
 #'
 #' @details
+#' The function run all methods with their default thresholds
 #'
 #' @return
+#' The function returns a list with two data frames. One with daily and detailed values for all methods and a list with one data frame for each method, each containing a summary of all identified events.
+#'
 #' @export
 #'
 #' @examples
@@ -61,7 +64,7 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
     # 5. Christian et al. 2020
     fd_Christian <- Christian2020_clean_data(vtime = df_d$time,
                                              vET0 = ET0$et0, vETa = ETa$eta,
-                                             threshold = 1) %>% Christian2020()
+                                             threshold = 2) %>% Christian2020()
     print('Christian et al: Done')
 
 
@@ -92,7 +95,8 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
                                       vprec = df_d$precipitation,
                                       vet0 = ET0$et0,
                                       veta = ETa$eta,
-                                      score = 95)
+                                      score = 0.6,
+                                      d_score = 0.2)
 
     print('Multi-criteria: Done')
 
@@ -143,7 +147,7 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
     # 5. Christian et al. 2020
     fd_Christian <- Christian2020_clean_data(vtime = df_d$time,
                                              vET0 = df_d$pev, vETa = df_d$e,
-                                             threshold = 1) %>% Christian2020()
+                                             threshold = 2) %>% Christian2020()
     print('Christian et al: Done')
 
 
@@ -299,7 +303,9 @@ process_all <- function(df_d,include_variables = T, data = 'station'){
     EDDI <- data.frame(time = fd_Pendergrass[[1]]$time, eddi = fd_Pendergrass[[1]]$percentile)
     an_slope_prec <- data.frame(time = as.Date(fd_Alencar[[1]]$Date), an_slope_prec = fd_Alencar[[1]]$anomaly_slope_prec)
     an_slope_et0 <- data.frame(time = as.Date(fd_Alencar[[1]]$Date), an_slope_et0 = fd_Alencar[[1]]$anomaly_slope_et0)
-    score <- data.frame(time = as.Date(fd_Multi_crit[[1]]$time), score_perc = fd_Multi_crit[[1]]$score_percentile_global)
+    score <- data.frame(time = as.Date(fd_Multi_crit[[1]]$time),
+                        score_perc = fd_Multi_crit[[1]]$score_percentile_global,
+                        score = fd_Multi_crit[[1]]$score)
 
     complete_series <- dplyr::left_join(complete_series,swc_p20, by= 'time') %>%
       dplyr::left_join(swc_p40, by= 'time') %>%

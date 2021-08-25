@@ -1,3 +1,18 @@
+#' @title Accumulation into pentads
+#'
+#' @param vtime data frame column or vector containing \code{date} data
+#' @param vvalue data frame column or vector containing the analysed data
+#' @param na_rm boolean (should NA values be removed? Defaulf = F)
+#' @param f \code{R function} to be applied (default = mean)
+#'
+#' @return The function return a list with two elements. One data frame with time stamped pentad values and a matrix with the 73 pentads organized in lines and years in columns.
+#'
+#' @description Internal function to accumulate data into pentads (5-day long periods) using different accumulation functions (mean, max, min, sum, etc.)
+#'
+#' @export
+#'
+#' @examples
+
 f.pentad <- function(vtime, vvalue, na_rm = F, f = mean){
 
   data.var <- data.frame(time = vtime, var = vvalue)

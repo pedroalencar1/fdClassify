@@ -1,10 +1,14 @@
-#' df_fluxnet
+#' @title get_df_fluxnet - Generate DF from FLUXNET raw data
 #'
 #' @param filename name of fluxnet file
 #' @param timestep what is the analysed timestep, if daily or hourly
-#' @param soil_level Which is the sensor index?
+#' @param soil_level Which is the sensor index (depends on the station, please pay attention to the .csv file)
+#'
+#' @description
+#' Builds data frame to be used as input in all functions from the raw FLUXNET data (.csv)
 #'
 #' @return
+#'
 #' @export df
 #'
 #' @examples

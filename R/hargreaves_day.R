@@ -1,5 +1,17 @@
 ################### BASIC FUNCTIONS ###########################################
 
+#' @title Hargreaves-Samany daily-ET0 function
+#'
+#' @param vtime data frame column or vector containing \code{date} data
+#' @param vtemperature data frame column or vector containing temperature
+#' @param my_lat Latitude of study area
+#'
+#' @return The function return a data frame with two columns, time stamps (daily) and ET0
+#'
+#' @export
+#'
+#' @examples
+#'
 hargreaves_day <- function(vtime, vtemperature, my_lat) {
 
   data_temp <- data.frame(time = vtime, value = vtemperature)

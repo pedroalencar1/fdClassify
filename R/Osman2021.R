@@ -1,3 +1,18 @@
+#' @title FD identification based on Osman et al. (2020)
+#'
+#' @param vtime data frame column or vector containing \code{date} data
+#' @param vswc data frame column or vector containing soil moisture data
+#' @param threshold a numeric value (default = 20) indicating the lower limit of SM percentile for FD identification
+#'
+#' @return The function returns a list with two data frames. One with pentad and detailed values from the function and a second with a summary of all events identified.
+#'
+#' @export
+#'
+#' @examples
+#' fd_Osman  <- Osman2021(vtime = df_d$time,
+#'                        vswc = df_d$soil_water,
+#'                        threshold = 20)
+#'
 Osman2021 <- function(vtime, vswc, threshold = 20){
 
 
@@ -42,25 +57,26 @@ Osman2021 <- function(vtime, vswc, threshold = 20){
   index_df <- data.frame(index = index_aux2, length = index_aux)
   index_df <- index_df[index_df$length > 3,]
 
+  index_df$beg <- index_df$index - index_df$length + 1
+  index_df$end <- index_df$index
+
   #get events that reach 20 percentile
   for (i in 1:nrow(index_df)){
-    index_df$beg[i] <- index_df$index[i] - index_df$length[i] + 1
-    index_df$end[i] <- index_df$index[i]
 
-    if (min(swc_df$percentile[index_df$beg[i]:index_df$end[i]]) >= 20){
+    if (min(swc_df$percentile[index_df$beg[i]:index_df$end[i]]) >= threshold){
       index_df[i,] <- NA
     }
   }
 
   index_df <- index_df[complete.cases(index_df),] #this are events that reach 20p and respect the intensification rule
 
-  #remove events that are too short
-  for (i in 1:nrow(index_df)){
-    if (min(swc_df$percentile[(index_df$beg[i]+3):index_df$end[i]]) >= 20){
-      index_df[i,] <- NA
-    }
+#remove events that are too short
+for (i in 1:nrow(index_df)){
+  if (min(swc_df$percentile[(index_df$beg[i]+3):index_df$end[i]]) >= threshold){
+    index_df[i,] <- NA
   }
-  index_df <- index_df[complete.cases(index_df),] #this are events that reach 20p and respect the intensification rule
+}
+index_df <- index_df[complete.cases(index_df),] #this are events that reach 20p and respect the intensification rule
 
 
   index_df$onset <- 0
@@ -68,19 +84,17 @@ Osman2021 <- function(vtime, vswc, threshold = 20){
     # print(i)
     swc_aux <- swc_df$percentile[(3+index_df$beg[i]):index_df$end[i]]
 
-
-    id_onset <- min(which(swc_aux<=20))
+    id_onset <- min(which(swc_aux<=threshold))
     index_df$onset[i] <- 3+index_df$beg[i] + id_onset - 1
 
-    if (max(swc_aux[id_onset:length(swc_aux)])>= 20){ #the event ends before the current end
-      id_end <- min(which(swc_aux[id_onset:length(swc_aux)]>= 20))
+    # Adjust event duration for cases when SW is over 20 percentile (second criterion for end of FD)
+    if (max(swc_aux[id_onset:length(swc_aux)])>= threshold){
+      id_end <- min(which(swc_aux[id_onset:length(swc_aux)]>= threshold))
       index_df$end[i] <- index_df$onset[i] +id_end - 1
       index_df$length[i] <- index_df$end[i] - index_df$beg[i] + 1
     }
     index_df$index[i] <- index_df$end[i]
   }
-
-
 
   # join evetns to series
   swc_df$index <- 1:nrow(swc_df)
@@ -127,16 +141,6 @@ Osman2021 <- function(vtime, vswc, threshold = 20){
     }
   }
 
-
-  # # limit max duration
-  # for (i in 1:nrow(swc_df)){
-  #   if (swc_df$dur[i] > 12) {
-  #     swc_df$dur[i] <- 0
-  #     swc_df$is.fd[i] <- 0
-  #   }
-  # }
-  #
-  #
 
   ######################################################
 

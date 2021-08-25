@@ -1,3 +1,16 @@
+#' @title get.nc.data - Function to extract data from ERA5 raw data
+#'
+#' @param my_lon Longituge of study area (decimal degrees)
+#' @param my_lat Latitude of study area (decimal degrees)
+#' @param my_filename File name
+#' @param vname Variable to be extracted
+#' @param file boolean, indicate if a csv file should be generated (defaulf = True)
+#'
+#' @return The function returns a data frame containing one variable and time stamps
+#'
+#' @export
+#'
+#' @examples
 get.nc.data <- function(my_lon,my_lat,my_filename,vname, file = T){
 
   z <- length(my_filename)

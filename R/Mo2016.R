@@ -1,6 +1,24 @@
 
-#function - FD identification based on Mo & Lettenmeier (2015, 2016)
-
+#' @title FD identification based on Mo & Lettenmeier (2015, 2016)
+#'
+#' @param vtime data frame column or vector containing \code{date} data
+#' @param vprecipitation data frame column or vector containing daily precipitation
+#' @param vtemperature data frame column or vector containing daily temperature
+#' @param vsoil_water data frame column or vector containing soil water content (soil moisture)
+#' @param vlatent_heat data frame column or vector containing daily total latent heat flux (to calculate actual evapotranspiration)
+#' @param vevap data frame column or vector containing daily actual evapontranspiration (if already available)
+#' @param flux_data boolean, indicates if the data is from eddy covariance stations.
+#'
+#' @return
+#' The function returns a list with two data frames. One with pentad and detailed values from the function and a second with a summary of all events identified.
+#'
+#' @export
+#'
+#' @examples
+#' fd_Mo <- Mo2016(vtime = df_d$time, vprecipitation = df_d$precipitation,
+#'                 vtemperature = df_d$temperature, vsoil_water = df_d$soil_water,
+#'                 vlatent_heat = df_d$latent_heat, flux_data = T)
+#'
 Mo2016 <- function(vtime, vprecipitation, vtemperature, vsoil_water,
                    vlatent_heat = NULL, vevap = NULL, flux_data = T){
 

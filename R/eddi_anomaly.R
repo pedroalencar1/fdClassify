@@ -1,9 +1,20 @@
-#function to calculate EDDI following Hobbins et al., 2016
 
-# It receives a single input, a vector/dataframe-row with ET0 data organized as follows:
-# a) years separates by column
-# b) weeks (or other time window of interest) separated by rows
-
+#' @title Calculate EDDI
+#'
+#' @description function to calculate EDDI (Evaporative Demand Drought Index) following Hobbins et al., 2016
+#'
+#' @param vet0 data frame column or vector containing daily ET0 (potential evapotranspiration). It can be obtained with the function \code(penman_day)
+#'
+#' @return vector with EDDI values
+#'
+#' @export
+#'
+#' @examples
+#' eddi_values <- penman_day(vtime = de_tha_d$time, vwind = de_tha_d$wind_speed,
+#'                           vvpd = de_tha_d$vapor_p_def, vtemp = de_tha_d$temperature,
+#'                           vheatflux = (de_tha_d$sensible_heat + de_tha_d$latent_heat))[,2] %>%
+#'                           eddi()
+#'
 eddi <- function(vet0){
 
   n <- length(vet0)

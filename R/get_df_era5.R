@@ -1,3 +1,26 @@
+#' @title get_df_era5 - Generate DF from ERA5 raw (netcedf) data
+#'
+#' @param list_files vector containing the name of file(s)
+#' @param lat latitude of study area (decimal degrees)
+#' @param lon longitude of study area (decimal degrees)
+#' @param soil_layers vector with on or more values between 1 and 4. This indicates which are the soil layers desired in the analysis. More information in the function description.
+#'
+#' @description The ERA5 provides 4 soil water content layers:
+#'         Layer 1: 0 - 7cm,
+#'         Layer 2: 7 - 28cm,
+#'         Layer 3: 28 - 100cm,
+#'         Layer 4: 100 - 289cm.
+#'
+#' @return The function returns a data frame with all variables of interest:
+#'         Precipitation (tp)
+#'         Temperature (t2m)
+#'         Potential evapotranspiration (pev)
+#'         actual evapotranspiration (e)
+#'         volumetric soil water content (vswl1, vswl2, vswl3, vswl4)
+#'
+#' @export
+#'
+#' @examples
 get_df_era5 <- function(list_files, lat, lon, soil_layers = c(1)){
 
   #Name of useful variables

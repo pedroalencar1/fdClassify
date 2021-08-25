@@ -1,7 +1,0 @@
-"0","ts.perc.swc <- ts(c(perc.swc), frequency = 73, start = beg)
-plot.ts(ts.perc.swc, ylab = 'Percentile - SWC (%)', main = 'Percentiles of Soil Water Content')+
-  lines(x = c(0,2016), y = c(20,20),col ='red')+
-  lines(x = c(0,2016), y = c(40,40),col ='yellow')
-"
-"1","integer(0)
-"

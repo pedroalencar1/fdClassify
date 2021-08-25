@@ -28,6 +28,9 @@
 #' @export
 #'
 #' @examples
+#' fd_Pendergrass <- Pendergrass2020(vtime = de_tha_d$time,
+#'                                   vet0 = ET0$et0, limit.down = 10)
+#'
 Pendergrass2020 <- function(vtime, vet0, limit.down = 10){
 
   et0 <- data.frame(time = vtime, et0 = vet0)
