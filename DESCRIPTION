@@ -12,7 +12,7 @@ Description: This package brings functions to classify FD based on several defin
     - Christian et al. (2020)
     - Osman et al. (2021)
         * Please refer to the README file for further bibliography of the package
-License: What license is it under?
+License: MIT License Copyright (c) 2021 Pedro Alencar
 Encoding: UTF-8
 LazyData: true
 Imports: tidyr,dplyr,readr,tibbletime,lubridate,stringr,runner,magrittr, ncdf4, ncdf4.helpers,ggplot2, grDevices, gridExtra, vctrs, caret
