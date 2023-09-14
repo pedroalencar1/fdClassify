@@ -15,4 +15,4 @@ Two datasets are preloaded (de_tha_d and de_tha_h) for daily and hourly data fro
 
 More info on the preloaded datasets can be found on http://sites.fluxdata.org/DE-Tha/.
 
-For doubts, contributions or colaborations you can reach the Author of this package in pedrohlalencar@gmail.com or pedro.alencar@campus.tu-berlin.de
+For doubts, contributions or colaborations you can reach the Author of this package at pedro.alencar@campus.tu-berlin.de

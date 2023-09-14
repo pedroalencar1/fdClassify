@@ -16,7 +16,7 @@ The function returns a list with two data frames. One with weekly and detailed v
 FD identification method from Christian et al. (2020)
 }
 \examples{
-#' fd_Christian <- Christian2020_clean_data(vtime = df_d$time,
+fd_Christian <- Christian2020_clean_data(vtime = df_d$time,
 vET0 = ET0$et0, vETa = ETa$eta,
 threshold = 2) \%>\% Christian2020()
 
